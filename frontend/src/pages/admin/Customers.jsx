@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Eye, Mail, Phone, MapPin, Calendar, ShoppingBag, Send, Edit, UserCheck, UserX, Crown, Star, Award } from 'lucide-react';
+import { Search, Filter, Eye, Mail, Phone, MapPin, Calendar, ShoppingBag, Send, Edit, UserCheck, UserX, Crown, Star, Award, Users, UserPlus } from 'lucide-react';
 import DashboardLayout from '../../components/admin/DashboardLayout';
 import Modal from '../../components/common/Modal';
 import toast from 'react-hot-toast';
@@ -21,101 +21,123 @@ const AdminCustomers = () => {
   }, []);
 
   const loadCustomers = () => {
-    // In a real app, this would fetch from API
-    // For now, using mock data with enhanced customer management
+    // Load real customers from orders
+    const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+    const realCustomers = [];
+    const customerMap = new Map();
+
+    // Extract unique customers from orders
+    orders.forEach(order => {
+      const customerKey = order.deliveryInfo.email.toLowerCase();
+      
+      if (!customerMap.has(customerKey)) {
+        // Create customer from first order
+        const customer = {
+          id: `real_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          name: order.deliveryInfo.fullName,
+          email: order.deliveryInfo.email,
+          phone: order.deliveryInfo.phone,
+          address: `${order.deliveryInfo.address}, ${order.deliveryInfo.city}, ${order.deliveryInfo.zipCode}`,
+          joinDate: order.createdAt.split('T')[0], // Extract date part
+          totalOrders: 0,
+          totalSpent: 0,
+          lastOrder: null,
+          status: 'active',
+          customerType: 'regular',
+          loyaltyPoints: 0,
+          registrationSource: 'checkout',
+          notes: 'Customer from order system'
+        };
+        customerMap.set(customerKey, customer);
+      }
+      
+      // Update customer statistics
+      const customer = customerMap.get(customerKey);
+      customer.totalOrders += 1;
+      customer.totalSpent += Number(order.total);
+      customer.loyaltyPoints += Math.floor(Number(order.total) / 10);
+      
+      // Update last order date
+      if (!customer.lastOrder || new Date(order.createdAt) > new Date(customer.lastOrder)) {
+        customer.lastOrder = order.createdAt.split('T')[0];
+      }
+      
+      // Auto-promote based on spending
+      if (customer.totalSpent >= 1000) {
+        customer.customerType = 'premium';
+      } else if (customer.totalSpent >= 500) {
+        customer.customerType = 'vip';
+      }
+    });
+
+    // Convert map to array
+    realCustomers.push(...customerMap.values());
+
+    // Load saved customer modifications from localStorage
+    const savedCustomers = JSON.parse(localStorage.getItem('customerModifications') || '{}');
+    realCustomers.forEach(customer => {
+      if (savedCustomers[customer.email]) {
+        customer.status = savedCustomers[customer.email].status || customer.status;
+        customer.customerType = savedCustomers[customer.email].customerType || customer.customerType;
+      }
+    });
+
+    // Add some mock customers for demo (you can remove this in production)
     const mockCustomers = [
       {
-        id: 1,
-        name: 'John Doe',
-        email: 'john@example.com',
-        phone: '+251911123456',
-        address: '123 Main St, Addis Ababa',
+        id: 'mock_1',
+        name: 'Demo Customer 1',
+        email: 'demo1@example.com',
+        phone: '+251911111111',
+        address: '123 Demo St, Addis Ababa',
         joinDate: '2024-01-15',
-        totalOrders: 12,
-        totalSpent: 5400,
+        totalOrders: 5,
+        totalSpent: 2500,
         lastOrder: '2024-04-08',
         status: 'active',
         customerType: 'vip',
-        loyaltyPoints: 540,
+        loyaltyPoints: 250,
         registrationSource: 'website',
-        notes: 'Frequent customer, prefers spicy food'
+        notes: 'Demo customer for testing'
       },
       {
-        id: 2,
-        name: 'Jane Smith',
-        email: 'jane@example.com',
-        phone: '+251911234567',
-        address: '456 Oak Ave, Addis Ababa',
+        id: 'mock_2',
+        name: 'Demo Customer 2',
+        email: 'demo2@example.com',
+        phone: '+251911222222',
+        address: '456 Demo Ave, Addis Ababa',
         joinDate: '2024-02-20',
-        totalOrders: 8,
-        totalSpent: 3200,
+        totalOrders: 2,
+        totalSpent: 800,
         lastOrder: '2024-04-10',
-        status: 'active',
+        status: 'inactive',
         customerType: 'regular',
-        loyaltyPoints: 320,
+        loyaltyPoints: 80,
         registrationSource: 'mobile_app',
-        notes: ''
-      },
-      {
-        id: 3,
-        name: 'Mike Johnson',
-        email: 'mike@example.com',
-        phone: '+251911345678',
-        address: '789 Pine Rd, Addis Ababa',
-        joinDate: '2024-03-10',
-        totalOrders: 3,
-        totalSpent: 1200,
-        lastOrder: '2024-03-25',
-        status: 'inactive',
-        customerType: 'regular',
-        loyaltyPoints: 120,
-        registrationSource: 'website',
-        notes: 'Has not ordered in over 2 weeks'
-      },
-      {
-        id: 4,
-        name: 'Sarah Wilson',
-        email: 'sarah@example.com',
-        phone: '+251911456789',
-        address: '321 Elm St, Addis Ababa',
-        joinDate: '2024-01-05',
-        totalOrders: 25,
-        totalSpent: 12500,
-        lastOrder: '2024-04-09',
-        status: 'active',
-        customerType: 'premium',
-        loyaltyPoints: 1250,
-        registrationSource: 'referral',
-        notes: 'Premium customer, always orders large quantities'
-      },
-      {
-        id: 5,
-        name: 'Ahmed Hassan',
-        email: 'ahmed@example.com',
-        phone: '+251911567890',
-        address: '654 Cedar Ave, Addis Ababa',
-        joinDate: '2024-03-01',
-        totalOrders: 0,
-        totalSpent: 0,
-        lastOrder: null,
-        status: 'inactive',
-        customerType: 'regular',
-        loyaltyPoints: 0,
-        registrationSource: 'website',
-        notes: 'Registered but never placed an order'
+        notes: 'Demo inactive customer'
       }
     ];
-    setCustomers(mockCustomers);
+
+    // Combine real and mock customers
+    const allCustomers = [...realCustomers, ...mockCustomers];
+    setCustomers(allCustomers);
   };
 
-  const filters = ['all', 'active', 'inactive', 'suspended', 'regular', 'vip', 'premium'];
+  const filters = ['all', 'real', 'demo', 'active', 'inactive', 'suspended', 'regular', 'vip', 'premium'];
 
   const filteredCustomers = customers.filter(customer => {
     const matchesSearch = customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          customer.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = selectedFilter === 'all' || 
-                         customer.status === selectedFilter || 
-                         customer.customerType === selectedFilter;
+    
+    let matchesFilter = true;
+    if (selectedFilter === 'real') {
+      matchesFilter = customer.registrationSource === 'checkout';
+    } else if (selectedFilter === 'demo') {
+      matchesFilter = customer.registrationSource !== 'checkout';
+    } else if (selectedFilter !== 'all') {
+      matchesFilter = customer.status === selectedFilter || customer.customerType === selectedFilter;
+    }
+    
     return matchesSearch && matchesFilter;
   });
 
@@ -134,6 +156,32 @@ const AdminCustomers = () => {
       case 'vip': return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400';
       case 'premium': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
       default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+    }
+  };
+
+  const getCustomerSourceIcon = (registrationSource) => {
+    if (registrationSource === 'checkout') {
+      return <Users size={14} className="text-green-600" title="Real Customer" />;
+    } else {
+      return <UserPlus size={14} className="text-blue-600" title="Demo Customer" />;
+    }
+  };
+
+  const getCustomerSourceBadge = (registrationSource) => {
+    if (registrationSource === 'checkout') {
+      return (
+        <span className="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+          <Users size={12} className="mr-1" />
+          REAL
+        </span>
+      );
+    } else {
+      return (
+        <span className="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+          <UserPlus size={12} className="mr-1" />
+          DEMO
+        </span>
+      );
     }
   };
 
@@ -182,6 +230,16 @@ const AdminCustomers = () => {
       );
       
       setCustomers(updatedCustomers);
+      
+      // Save customer modifications to localStorage for persistence
+      const savedCustomers = JSON.parse(localStorage.getItem('customerModifications') || '{}');
+      savedCustomers[selectedCustomer.email] = {
+        status: newStatus,
+        customerType: newCustomerType,
+        updatedAt: new Date().toISOString()
+      };
+      localStorage.setItem('customerModifications', JSON.stringify(savedCustomers));
+      
       setShowStatusModal(false);
       setSelectedCustomer(null);
       toast.success('Customer updated successfully');
@@ -192,8 +250,13 @@ const AdminCustomers = () => {
   };
 
   const getCustomerStats = () => {
+    const realCustomers = customers.filter(c => c.registrationSource === 'checkout');
+    const demoCustomers = customers.filter(c => c.registrationSource !== 'checkout');
+    
     return {
       total: customers.length,
+      real: realCustomers.length,
+      demo: demoCustomers.length,
       active: customers.filter(c => c.status === 'active').length,
       inactive: customers.filter(c => c.status === 'inactive').length,
       suspended: customers.filter(c => c.status === 'suspended').length,
@@ -201,7 +264,8 @@ const AdminCustomers = () => {
       vip: customers.filter(c => c.customerType === 'vip').length,
       premium: customers.filter(c => c.customerType === 'premium').length,
       avgOrders: customers.length > 0 ? Math.round(customers.reduce((sum, c) => sum + c.totalOrders, 0) / customers.length) : 0,
-      totalRevenue: customers.reduce((sum, c) => sum + c.totalSpent, 0)
+      totalRevenue: customers.reduce((sum, c) => sum + c.totalSpent, 0),
+      realRevenue: realCustomers.reduce((sum, c) => sum + c.totalSpent, 0)
     };
   };
 
@@ -211,7 +275,7 @@ const AdminCustomers = () => {
     <DashboardLayout title="Customers Management">
       <div className="space-y-6">
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-6">
           <div className="bg-white dark:bg-dark-800 rounded-lg shadow p-6">
             <div className="flex items-center">
               <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
@@ -227,11 +291,23 @@ const AdminCustomers = () => {
           <div className="bg-white dark:bg-dark-800 rounded-lg shadow p-6">
             <div className="flex items-center">
               <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                <UserCheck className="h-6 w-6 text-green-600 dark:text-green-400" />
+                <Users className="h-6 w-6 text-green-600 dark:text-green-400" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Active</p>
-                <p className="text-2xl font-semibold text-gray-900 dark:text-white">{stats.active}</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Real Customers</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-white">{stats.real}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white dark:bg-dark-800 rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                <UserPlus className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Demo Customers</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-white">{stats.demo}</p>
               </div>
             </div>
           </div>
@@ -266,8 +342,8 @@ const AdminCustomers = () => {
                 <ShoppingBag className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Revenue</p>
-                <p className="text-2xl font-semibold text-gray-900 dark:text-white">${stats.totalRevenue.toLocaleString()}</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Real Revenue</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-white">${stats.realRevenue.toLocaleString()}</p>
               </div>
             </div>
           </div>
@@ -295,7 +371,10 @@ const AdminCustomers = () => {
               >
                 {filters.map(filter => (
                   <option key={filter} value={filter}>
-                    {filter === 'all' ? 'All Customers' : filter.charAt(0).toUpperCase() + filter.slice(1)}
+                    {filter === 'all' ? 'All Customers' : 
+                     filter === 'real' ? 'Real Customers Only' :
+                     filter === 'demo' ? 'Demo Customers Only' :
+                     filter.charAt(0).toUpperCase() + filter.slice(1)}
                   </option>
                 ))}
               </select>
@@ -311,6 +390,9 @@ const AdminCustomers = () => {
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Customer
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Source
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Contact
@@ -354,6 +436,9 @@ const AdminCustomers = () => {
                           </div>
                         </div>
                       </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {getCustomerSourceBadge(customer.registrationSource)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900 dark:text-white">
@@ -459,6 +544,7 @@ const AdminCustomers = () => {
                       {selectedCustomer.customerType.toUpperCase()}
                     </span>
                   </div>
+                  {getCustomerSourceBadge(selectedCustomer.registrationSource)}
                 </div>
               </div>
             </div>
@@ -502,7 +588,12 @@ const AdminCustomers = () => {
                   </div>
                   <div>
                     <p className="text-sm text-gray-600 dark:text-gray-400">Registration Source</p>
-                    <p className="text-sm text-gray-900 dark:text-white capitalize">{selectedCustomer.registrationSource.replace('_', ' ')}</p>
+                    <div className="flex items-center space-x-2">
+                      {getCustomerSourceIcon(selectedCustomer.registrationSource)}
+                      <span className="text-sm text-gray-900 dark:text-white capitalize">
+                        {selectedCustomer.registrationSource === 'checkout' ? 'Real Customer (From Orders)' : 'Demo Customer'}
+                      </span>
+                    </div>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600 dark:text-gray-400">Join Date</p>
