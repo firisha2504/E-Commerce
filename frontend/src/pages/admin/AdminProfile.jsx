@@ -121,6 +121,16 @@ const AdminProfile = () => {
       
       setIsEditing(false);
       setShowSuccessModal(true);
+      
+      // Add notification
+      if (window.addNotification) {
+        window.addNotification({
+          type: 'success',
+          title: 'Profile Updated',
+          message: 'Your profile information has been successfully updated.'
+        });
+      }
+      
       toast.success('Profile updated successfully!');
     } catch (error) {
       console.error('Profile update error:', error);

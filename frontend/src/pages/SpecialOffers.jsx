@@ -1,81 +1,66 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Tag, Clock, Star, ShoppingCart, Calendar, Gift, Percent } from 'lucide-react';
 
 const SpecialOffers = () => {
-  const offers = [
-    {
-      id: 1,
-      title: 'Weekend Special',
-      description: 'Get 15% off on all orders every Saturday and Sunday',
-      discount: '15% OFF',
-      validUntil: 'Every Weekend',
-      image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800',
-      category: 'Weekend Deal',
-      color: 'orange'
-    },
-    {
-      id: 2,
-      title: 'Lunch Combo Deal',
-      description: 'Special lunch combo with main dish, side, and drink for only ETB 250',
-      discount: 'ETB 250',
-      validUntil: 'Mon-Fri, 11AM-3PM',
-      image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800',
-      category: 'Lunch Special',
-      color: 'green'
-    },
-    {
-      id: 3,
-      title: 'Family Feast',
-      description: 'Order for 4 or more and get a free dessert platter',
-      discount: 'Free Dessert',
-      validUntil: 'Valid All Week',
-      image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800',
-      category: 'Family Deal',
-      color: 'blue'
-    },
-    {
-      id: 4,
-      title: 'First Order Discount',
-      description: 'New customers get 20% off their first order',
-      discount: '20% OFF',
-      validUntil: 'One-time Use',
-      image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800',
-      category: 'New Customer',
-      color: 'purple'
-    },
-    {
-      id: 5,
-      title: 'Coffee Lover Special',
-      description: 'Buy 2 Ethiopian coffees, get 1 free',
-      discount: 'Buy 2 Get 1',
-      validUntil: 'Daily 2PM-5PM',
-      image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800',
-      category: 'Beverage Deal',
-      color: 'yellow'
-    },
-    {
-      id: 6,
-      title: 'Birthday Special',
-      description: 'Celebrate your birthday with us and get a free cake',
-      discount: 'Free Cake',
-      validUntil: 'On Your Birthday',
-      image: 'https://images.unsplash.com/photo-1558636508-e0db3814bd1d?w=800',
-      category: 'Birthday Offer',
-      color: 'pink'
-    }
-  ];
+  const [offers, setOffers] = useState([]);
 
-  const getColorClasses = (color) => {
-    const colors = {
-      orange: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
-      green: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-      blue: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-      purple: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
-      yellow: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-      pink: 'bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-400'
+  useEffect(() => {
+    loadOffers();
+  }, []);
+
+  const loadOffers = () => {
+    try {
+      const savedOffers = JSON.parse(localStorage.getItem('specialOffers') || '[]');
+      
+      // Filter only active and non-expired offers for customers
+      const activeOffers = savedOffers.filter(offer => 
+        offer.status === 'active' && new Date(offer.validUntil) >= new Date()
+      );
+      
+      setOffers(activeOffers);
+    } catch (error) {
+      console.error('Failed to load offers:', error);
+      setOffers([]);
+    }
+  };
+
+  const getDiscountDisplay = (offer) => {
+    if (offer.discountType === 'percentage') {
+      return `${offer.discountValue}% OFF`;
+    } else if (offer.discountType === 'fixed') {
+      return `ETB ${offer.discountValue} OFF`;
+    } else if (offer.discountType === 'free_item') {
+      return 'Free Item';
+    } else if (offer.discountType === 'buy_x_get_y') {
+      return `Buy ${Math.floor(offer.discountValue)} Get 1`;
+    } else {
+      return offer.discountValue;
+    }
+  };
+
+  const getImageSrc = (imageSrc) => {
+    // If it's a localStorage key, retrieve the actual image data
+    if (imageSrc && imageSrc.startsWith('special_offer_image_')) {
+      const storedImage = localStorage.getItem(imageSrc);
+      return storedImage || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800';
+    }
+    // If it's a URL or empty, return as is or default
+    return imageSrc || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800';
+  };
+
+  const getColorClasses = (category) => {
+    const colorMap = {
+      'Weekend Deal': 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
+      'New Customer': 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
+      'Lunch Special': 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+      'Family Deal': 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+      'Beverage Deal': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+      'Birthday Offer': 'bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-400',
+      'Holiday Special': 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+      'General': 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'
     };
-    return colors[color] || colors.orange;
+    return colorMap[category] || colorMap['General'];
   };
 
   return (
@@ -147,19 +132,19 @@ const SpecialOffers = () => {
               {/* Image */}
               <div className="relative h-48 overflow-hidden">
                 <img
-                  src={offer.image}
+                  src={getImageSrc(offer.image)}
                   alt={offer.title}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                 />
                 <div className="absolute top-4 right-4">
-                  <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getColorClasses(offer.color)}`}>
+                  <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getColorClasses(offer.category)}`}>
                     {offer.category}
                   </span>
                 </div>
                 <div className="absolute bottom-4 left-4">
                   <div className="bg-white dark:bg-dark-800 px-4 py-2 rounded-lg shadow-lg">
                     <span className="text-primary-600 dark:text-accent-400 font-bold text-lg">
-                      {offer.discount}
+                      {getDiscountDisplay(offer)}
                     </span>
                   </div>
                 </div>
@@ -177,8 +162,23 @@ const SpecialOffers = () => {
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
                     <Calendar size={16} className="mr-2" />
-                    {offer.validUntil}
+                    Valid until {new Date(offer.validUntil).toLocaleDateString()}
                   </div>
+                </div>
+
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600 dark:text-gray-400">Promo Code:</span>
+                    <code className="bg-gray-100 dark:bg-dark-700 px-2 py-1 rounded font-mono text-xs">
+                      {offer.promoCode}
+                    </code>
+                  </div>
+                  {offer.minOrderAmount > 0 && (
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600 dark:text-gray-400">Min Order:</span>
+                      <span className="text-gray-900 dark:text-gray-100">ETB {offer.minOrderAmount}</span>
+                    </div>
+                  )}
                 </div>
 
                 <Link
@@ -192,6 +192,19 @@ const SpecialOffers = () => {
             </div>
           ))}
         </div>
+
+        {/* No Offers Message */}
+        {offers.length === 0 && (
+          <div className="text-center py-12">
+            <Tag className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
+              No Active Offers
+            </h3>
+            <p className="text-gray-500 dark:text-gray-400">
+              Check back soon for exciting special offers and deals!
+            </p>
+          </div>
+        )}
 
         {/* How to Redeem Section */}
         <div className="mt-16 bg-white dark:bg-dark-800 rounded-2xl shadow-lg p-8">

@@ -29,6 +29,7 @@ import Reservations from './pages/Reservations';
 import SpecialOffers from './pages/SpecialOffers';
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminProducts from './pages/admin/Products';
+import AdminSpecialOffers from './pages/admin/SpecialOffers';
 import AdminOrders from './pages/admin/Orders';
 import AdminCustomers from './pages/admin/Customers';
 import AdminAnalytics from './pages/admin/Analytics';
@@ -126,6 +127,11 @@ function App() {
                   <Route path="/admin/products" element={
                     <AdminRoute>
                       <AdminProducts />
+                    </AdminRoute>
+                  } />
+                  <Route path="/admin/special-offers" element={
+                    <AdminRoute>
+                      <AdminSpecialOffers />
                     </AdminRoute>
                   } />
                   <Route path="/admin/orders" element={

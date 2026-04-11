@@ -157,6 +157,16 @@ const Checkout = () => {
       clearCart();
       
       setOrderId(newOrderId);
+      
+      // Add notification
+      if (window.addNotification) {
+        window.addNotification({
+          type: 'success',
+          title: 'Order Confirmed',
+          message: `Your order ${newOrderId} has been confirmed and is being prepared.`
+        });
+      }
+      
       setShowSuccessModal(true);
       
     } catch (error) {

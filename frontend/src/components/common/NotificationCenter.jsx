@@ -5,36 +5,54 @@ const NotificationCenter = () => {
   const [notifications, setNotifications] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
 
-  // Sample notifications for demo
+  // Load notifications from localStorage on mount
   useEffect(() => {
-    const sampleNotifications = [
-      {
-        id: 1,
-        type: 'success',
-        title: 'Order Confirmed',
-        message: 'Your order #ORD-123 has been confirmed and is being prepared.',
-        timestamp: new Date(Date.now() - 5 * 60 * 1000), // 5 minutes ago
-        read: false
-      },
-      {
-        id: 2,
-        type: 'info',
-        title: 'Profile Updated',
-        message: 'Your profile information has been successfully updated.',
-        timestamp: new Date(Date.now() - 30 * 60 * 1000), // 30 minutes ago
-        read: false
-      },
-      {
-        id: 3,
-        type: 'warning',
-        title: 'Payment Reminder',
-        message: 'Please complete payment for order #ORD-122 within 24 hours.',
-        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-        read: true
-      }
-    ];
-    setNotifications(sampleNotifications);
+    loadNotifications();
   }, []);
+
+  const loadNotifications = () => {
+    try {
+      const savedNotifications = JSON.parse(localStorage.getItem('userNotifications') || '[]');
+      
+      // Add some sample notifications if none exist (for demo purposes)
+      if (savedNotifications.length === 0) {
+        const sampleNotifications = [
+          {
+            id: Date.now() + 1,
+            type: 'success',
+            title: 'Welcome!',
+            message: 'Welcome to FA Restaurant! Explore our delicious Ethiopian cuisine.',
+            timestamp: new Date().toISOString(),
+            read: false
+          },
+          {
+            id: Date.now() + 2,
+            type: 'info',
+            title: 'Special Offers Available',
+            message: 'Check out our latest special offers and save on your next order!',
+            timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString(), // 30 minutes ago
+            read: false
+          }
+        ];
+        localStorage.setItem('userNotifications', JSON.stringify(sampleNotifications));
+        setNotifications(sampleNotifications);
+      } else {
+        setNotifications(savedNotifications);
+      }
+    } catch (error) {
+      console.error('Failed to load notifications:', error);
+      setNotifications([]);
+    }
+  };
+
+  const saveNotifications = (updatedNotifications) => {
+    try {
+      localStorage.setItem('userNotifications', JSON.stringify(updatedNotifications));
+      setNotifications(updatedNotifications);
+    } catch (error) {
+      console.error('Failed to save notifications:', error);
+    }
+  };
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
@@ -53,27 +71,45 @@ const NotificationCenter = () => {
     }
   };
 
+  const handleDropdownToggle = () => {
+    setIsOpen(!isOpen);
+    
+    // Auto-mark all notifications as read when opening the dropdown
+    if (!isOpen && unreadCount > 0) {
+      setTimeout(() => {
+        markAllAsRead();
+      }, 1000); // Mark as read after 1 second of viewing
+    }
+  };
+
   const markAsRead = (id) => {
-    setNotifications(prev =>
-      prev.map(notification =>
-        notification.id === id ? { ...notification, read: true } : notification
-      )
+    const updatedNotifications = notifications.map(notification =>
+      notification.id === id ? { ...notification, read: true } : notification
     );
+    saveNotifications(updatedNotifications);
   };
 
   const markAllAsRead = () => {
-    setNotifications(prev =>
-      prev.map(notification => ({ ...notification, read: true }))
-    );
+    const updatedNotifications = notifications.map(notification => ({ 
+      ...notification, 
+      read: true 
+    }));
+    saveNotifications(updatedNotifications);
   };
 
   const removeNotification = (id) => {
-    setNotifications(prev => prev.filter(n => n.id !== id));
+    const updatedNotifications = notifications.filter(n => n.id !== id);
+    saveNotifications(updatedNotifications);
+  };
+
+  const clearAllNotifications = () => {
+    saveNotifications([]);
   };
 
   const formatTime = (timestamp) => {
     const now = new Date();
-    const diff = now - timestamp;
+    const notificationTime = new Date(timestamp);
+    const diff = now - notificationTime;
     const minutes = Math.floor(diff / 60000);
     const hours = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
@@ -84,11 +120,33 @@ const NotificationCenter = () => {
     return `${days}d ago`;
   };
 
+  // Function to add new notifications (can be called from other components)
+  const addNotification = (notification) => {
+    const newNotification = {
+      id: Date.now(),
+      timestamp: new Date().toISOString(),
+      read: false,
+      ...notification
+    };
+    const updatedNotifications = [newNotification, ...notifications];
+    saveNotifications(updatedNotifications);
+  };
+
+  // Expose addNotification function globally for other components to use
+  useEffect(() => {
+    window.addNotification = addNotification;
+    return () => {
+      delete window.addNotification;
+    };
+  }, [notifications]);
+
+
+
   return (
     <div className="relative">
       {/* Notification Bell */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleDropdownToggle}
         className="relative p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
       >
         <Bell size={20} />
@@ -114,6 +172,14 @@ const NotificationCenter = () => {
                   className="text-sm text-primary-600 dark:text-accent-400 hover:text-primary-700 dark:hover:text-accent-300"
                 >
                   Mark all read
+                </button>
+              )}
+              {notifications.length > 0 && (
+                <button
+                  onClick={clearAllNotifications}
+                  className="text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
+                >
+                  Clear all
                 </button>
               )}
               <button
