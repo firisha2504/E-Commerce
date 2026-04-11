@@ -11,7 +11,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Home,
-  UserCog
+  UserCog,
+  Tag
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import ThemeToggle from '../common/ThemeToggle';
@@ -23,6 +24,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/admin' },
     { icon: Package, label: 'Products', path: '/admin/products' },
+    { icon: Tag, label: 'Special Offers', path: '/admin/special-offers' },
     { icon: ShoppingBag, label: 'Orders', path: '/admin/orders' },
     { icon: Users, label: 'Customers', path: '/admin/customers' },
     { icon: BarChart3, label: 'Analytics', path: '/admin/analytics' },

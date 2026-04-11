@@ -15,6 +15,7 @@ const AdminCustomers = () => {
   const [customers, setCustomers] = useState([]);
   const [newStatus, setNewStatus] = useState('');
   const [newCustomerType, setNewCustomerType] = useState('');
+  const [newCustomerCategory, setNewCustomerCategory] = useState('');
 
   useEffect(() => {
     loadCustomers();
@@ -46,6 +47,7 @@ const AdminCustomers = () => {
           customerType: 'regular',
           loyaltyPoints: 0,
           registrationSource: 'checkout',
+          customerCategory: 'temporary', // New field: temporary by default
           notes: 'Customer from order system'
         };
         customerMap.set(customerKey, customer);
@@ -62,7 +64,15 @@ const AdminCustomers = () => {
         customer.lastOrder = order.createdAt.split('T')[0];
       }
       
-      // Auto-promote based on spending
+      // Auto-suggest real customer status based on behavior
+      // Multiple orders or high spending suggests they should be "real" customers
+      if (customer.totalOrders >= 3 || customer.totalSpent >= 200) {
+        customer.suggestedCategory = 'real';
+      } else {
+        customer.suggestedCategory = 'temporary';
+      }
+      
+      // Auto-promote based on spending (VIP/Premium levels)
       if (customer.totalSpent >= 1000) {
         customer.customerType = 'premium';
       } else if (customer.totalSpent >= 500) {
@@ -79,6 +89,7 @@ const AdminCustomers = () => {
       if (savedCustomers[customer.email]) {
         customer.status = savedCustomers[customer.email].status || customer.status;
         customer.customerType = savedCustomers[customer.email].customerType || customer.customerType;
+        customer.customerCategory = savedCustomers[customer.email].customerCategory || customer.customerCategory;
       }
     });
 
@@ -98,6 +109,8 @@ const AdminCustomers = () => {
         customerType: 'vip',
         loyaltyPoints: 250,
         registrationSource: 'website',
+        customerCategory: 'real',
+        suggestedCategory: 'real',
         notes: 'Demo customer for testing'
       },
       {
@@ -107,14 +120,16 @@ const AdminCustomers = () => {
         phone: '+251911222222',
         address: '456 Demo Ave, Addis Ababa',
         joinDate: '2024-02-20',
-        totalOrders: 2,
-        totalSpent: 800,
+        totalOrders: 1,
+        totalSpent: 45,
         lastOrder: '2024-04-10',
-        status: 'inactive',
+        status: 'active',
         customerType: 'regular',
-        loyaltyPoints: 80,
+        loyaltyPoints: 4,
         registrationSource: 'mobile_app',
-        notes: 'Demo inactive customer'
+        customerCategory: 'temporary',
+        suggestedCategory: 'temporary',
+        notes: 'Demo one-time customer'
       }
     ];
 
@@ -123,7 +138,7 @@ const AdminCustomers = () => {
     setCustomers(allCustomers);
   };
 
-  const filters = ['all', 'real', 'demo', 'active', 'inactive', 'suspended', 'regular', 'vip', 'premium'];
+  const filters = ['all', 'real', 'temporary', 'suggested_real', 'active', 'inactive', 'suspended', 'regular', 'vip', 'premium'];
 
   const filteredCustomers = customers.filter(customer => {
     const matchesSearch = customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -131,9 +146,11 @@ const AdminCustomers = () => {
     
     let matchesFilter = true;
     if (selectedFilter === 'real') {
-      matchesFilter = customer.registrationSource === 'checkout';
-    } else if (selectedFilter === 'demo') {
-      matchesFilter = customer.registrationSource !== 'checkout';
+      matchesFilter = customer.customerCategory === 'real';
+    } else if (selectedFilter === 'temporary') {
+      matchesFilter = customer.customerCategory === 'temporary';
+    } else if (selectedFilter === 'suggested_real') {
+      matchesFilter = customer.suggestedCategory === 'real' && customer.customerCategory === 'temporary';
     } else if (selectedFilter !== 'all') {
       matchesFilter = customer.status === selectedFilter || customer.customerType === selectedFilter;
     }
@@ -159,27 +176,36 @@ const AdminCustomers = () => {
     }
   };
 
-  const getCustomerSourceIcon = (registrationSource) => {
-    if (registrationSource === 'checkout') {
-      return <Users size={14} className="text-green-600" title="Real Customer" />;
+  const getCustomerCategoryIcon = (category, suggestedCategory) => {
+    if (category === 'real') {
+      return <Users size={14} className="text-green-600" title="Real Customer - Loyal/Regular" />;
+    } else if (suggestedCategory === 'real') {
+      return <Star size={14} className="text-orange-600" title="Suggested for Real Customer Status" />;
     } else {
-      return <UserPlus size={14} className="text-blue-600" title="Demo Customer" />;
+      return <UserPlus size={14} className="text-blue-600" title="Temporary Customer" />;
     }
   };
 
-  const getCustomerSourceBadge = (registrationSource) => {
-    if (registrationSource === 'checkout') {
+  const getCustomerCategoryBadge = (category, suggestedCategory) => {
+    if (category === 'real') {
       return (
         <span className="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
           <Users size={12} className="mr-1" />
           REAL
         </span>
       );
+    } else if (suggestedCategory === 'real') {
+      return (
+        <span className="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400">
+          <Star size={12} className="mr-1" />
+          SUGGESTED
+        </span>
+      );
     } else {
       return (
         <span className="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
           <UserPlus size={12} className="mr-1" />
-          DEMO
+          TEMPORARY
         </span>
       );
     }
@@ -208,6 +234,7 @@ const AdminCustomers = () => {
     setSelectedCustomer(customer);
     setNewStatus(customer.status);
     setNewCustomerType(customer.customerType);
+    setNewCustomerCategory(customer.customerCategory);
     setShowStatusModal(true);
   };
 
@@ -225,7 +252,7 @@ const AdminCustomers = () => {
     try {
       const updatedCustomers = customers.map(customer =>
         customer.id === selectedCustomer.id
-          ? { ...customer, status: newStatus, customerType: newCustomerType }
+          ? { ...customer, status: newStatus, customerType: newCustomerType, customerCategory: newCustomerCategory }
           : customer
       );
       
@@ -236,6 +263,7 @@ const AdminCustomers = () => {
       savedCustomers[selectedCustomer.email] = {
         status: newStatus,
         customerType: newCustomerType,
+        customerCategory: newCustomerCategory,
         updatedAt: new Date().toISOString()
       };
       localStorage.setItem('customerModifications', JSON.stringify(savedCustomers));
@@ -250,13 +278,15 @@ const AdminCustomers = () => {
   };
 
   const getCustomerStats = () => {
-    const realCustomers = customers.filter(c => c.registrationSource === 'checkout');
-    const demoCustomers = customers.filter(c => c.registrationSource !== 'checkout');
+    const realCustomers = customers.filter(c => c.customerCategory === 'real');
+    const temporaryCustomers = customers.filter(c => c.customerCategory === 'temporary');
+    const suggestedReal = customers.filter(c => c.suggestedCategory === 'real' && c.customerCategory === 'temporary');
     
     return {
       total: customers.length,
       real: realCustomers.length,
-      demo: demoCustomers.length,
+      temporary: temporaryCustomers.length,
+      suggestedReal: suggestedReal.length,
       active: customers.filter(c => c.status === 'active').length,
       inactive: customers.filter(c => c.status === 'inactive').length,
       suspended: customers.filter(c => c.status === 'suspended').length,
@@ -306,8 +336,20 @@ const AdminCustomers = () => {
                 <UserPlus className="h-6 w-6 text-blue-600 dark:text-blue-400" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Demo Customers</p>
-                <p className="text-2xl font-semibold text-gray-900 dark:text-white">{stats.demo}</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Temporary</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-white">{stats.temporary}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white dark:bg-dark-800 rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
+                <Star className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Suggested Real</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-white">{stats.suggestedReal}</p>
               </div>
             </div>
           </div>
@@ -318,20 +360,8 @@ const AdminCustomers = () => {
                 <Crown className="h-6 w-6 text-purple-600 dark:text-purple-400" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">VIP</p>
-                <p className="text-2xl font-semibold text-gray-900 dark:text-white">{stats.vip}</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-white dark:bg-dark-800 rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
-                <Award className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Premium</p>
-                <p className="text-2xl font-semibold text-gray-900 dark:text-white">{stats.premium}</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">VIP + Premium</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-white">{stats.vip + stats.premium}</p>
               </div>
             </div>
           </div>
@@ -367,13 +397,14 @@ const AdminCustomers = () => {
               <select
                 value={selectedFilter}
                 onChange={(e) => setSelectedFilter(e.target.value)}
-                className="px-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-dark-700 text-gray-900 dark:text-gray-100"
+                className="px-4 py-2 pr-10 border border-gray-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-dark-700 text-gray-900 dark:text-gray-100 min-w-48"
               >
                 {filters.map(filter => (
                   <option key={filter} value={filter}>
                     {filter === 'all' ? 'All Customers' : 
-                     filter === 'real' ? 'Real Customers Only' :
-                     filter === 'demo' ? 'Demo Customers Only' :
+                     filter === 'real' ? 'Real Customers (Loyal)' :
+                     filter === 'temporary' ? 'Temporary Customers' :
+                     filter === 'suggested_real' ? 'Suggested for Real Status' :
                      filter.charAt(0).toUpperCase() + filter.slice(1)}
                   </option>
                 ))}
@@ -392,7 +423,7 @@ const AdminCustomers = () => {
                     Customer
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Source
+                    Category
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Contact
@@ -438,7 +469,7 @@ const AdminCustomers = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {getCustomerSourceBadge(customer.registrationSource)}
+                      {getCustomerCategoryBadge(customer.customerCategory, customer.suggestedCategory)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900 dark:text-white">
@@ -544,7 +575,7 @@ const AdminCustomers = () => {
                       {selectedCustomer.customerType.toUpperCase()}
                     </span>
                   </div>
-                  {getCustomerSourceBadge(selectedCustomer.registrationSource)}
+                  {getCustomerCategoryBadge(selectedCustomer.customerCategory, selectedCustomer.suggestedCategory)}
                 </div>
               </div>
             </div>
@@ -587,13 +618,20 @@ const AdminCustomers = () => {
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Registration Source</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Customer Category</p>
                     <div className="flex items-center space-x-2">
-                      {getCustomerSourceIcon(selectedCustomer.registrationSource)}
+                      {getCustomerCategoryIcon(selectedCustomer.customerCategory, selectedCustomer.suggestedCategory)}
                       <span className="text-sm text-gray-900 dark:text-white capitalize">
-                        {selectedCustomer.registrationSource === 'checkout' ? 'Real Customer (From Orders)' : 'Demo Customer'}
+                        {selectedCustomer.customerCategory === 'real' ? 'Real Customer (Loyal/Regular)' : 
+                         selectedCustomer.suggestedCategory === 'real' ? 'Temporary (Suggested for Real Status)' : 
+                         'Temporary Customer'}
                       </span>
                     </div>
+                    {selectedCustomer.suggestedCategory === 'real' && selectedCustomer.customerCategory === 'temporary' && (
+                      <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
+                        💡 This customer has {selectedCustomer.totalOrders} orders and spent ${selectedCustomer.totalSpent} - consider promoting to Real Customer
+                      </p>
+                    )}
                   </div>
                   <div>
                     <p className="text-sm text-gray-600 dark:text-gray-400">Join Date</p>
@@ -687,7 +725,7 @@ const AdminCustomers = () => {
       <Modal 
         isOpen={showStatusModal} 
         onClose={() => setShowStatusModal(false)}
-        title="Edit Customer Status & Type"
+        title="Edit Customer Status & Category"
       >
         {selectedCustomer && (
           <div className="space-y-4">
@@ -695,9 +733,35 @@ const AdminCustomers = () => {
               <p className="text-sm text-gray-600 dark:text-gray-400">Editing customer:</p>
               <p className="font-medium text-gray-900 dark:text-white">{selectedCustomer.name}</p>
               <p className="text-sm text-gray-600 dark:text-gray-400">{selectedCustomer.email}</p>
+              <div className="flex items-center space-x-2 mt-2">
+                <span className="text-sm text-gray-600 dark:text-gray-400">Current:</span>
+                {getCustomerCategoryBadge(selectedCustomer.customerCategory, selectedCustomer.suggestedCategory)}
+              </div>
+              {selectedCustomer.suggestedCategory === 'real' && selectedCustomer.customerCategory === 'temporary' && (
+                <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded p-2 mt-2">
+                  <p className="text-xs text-orange-800 dark:text-orange-200">
+                    💡 <strong>Suggestion:</strong> This customer has {selectedCustomer.totalOrders} orders and spent ${selectedCustomer.totalSpent}. 
+                    Consider promoting to "Real Customer" status for better service and loyalty rewards.
+                  </p>
+                </div>
+              )}
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Customer Category
+                </label>
+                <select
+                  value={newCustomerCategory}
+                  onChange={(e) => setNewCustomerCategory(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-accent-500 focus:border-transparent bg-white dark:bg-dark-700 text-gray-900 dark:text-gray-100"
+                >
+                  <option value="temporary">Temporary</option>
+                  <option value="real">Real Customer</option>
+                </select>
+              </div>
+              
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Customer Status
@@ -730,7 +794,12 @@ const AdminCustomers = () => {
             </div>
 
             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-              <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-2">Customer Type Benefits:</h4>
+              <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-2">Customer Categories:</h4>
+              <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+                <li><strong>Real Customer:</strong> Loyal customers who order regularly - get priority support and special offers</li>
+                <li><strong>Temporary:</strong> One-time or occasional customers - standard service</li>
+              </ul>
+              <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-2 mt-3">Customer Type Benefits:</h4>
               <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
                 <li><strong>Regular:</strong> Standard service</li>
                 <li><strong>VIP:</strong> 10% discount + free delivery + priority support</li>

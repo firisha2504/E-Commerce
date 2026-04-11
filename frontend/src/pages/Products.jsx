@@ -75,7 +75,7 @@ const Products = () => {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="pl-10 pr-8 py-2 border border-gray-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent appearance-none bg-white dark:bg-dark-800 text-gray-900 dark:text-gray-100"
+              className="pl-10 pr-12 py-3 border border-gray-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent appearance-none bg-white dark:bg-dark-800 text-gray-900 dark:text-gray-100 min-w-48"
             >
               <option value="">All Categories</option>
               {categories?.categories?.map((category) => {
