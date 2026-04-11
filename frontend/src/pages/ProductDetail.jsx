@@ -272,7 +272,7 @@ const ProductDetail = () => {
                     <button
                       onClick={() => {
                         addToCart(relatedProduct, 1);
-                        toast.success(`${relatedProduct.name} added to cart!`);
+                        // Removed duplicate toast - addToCart handles its own notification in individual pages
                       }}
                       className="absolute bottom-4 right-4 bg-white dark:bg-dark-800 text-primary-600 dark:text-accent-400 p-3 rounded-full shadow-lg transform translate-y-12 group-hover:translate-y-0 transition-all duration-500 hover:bg-primary-50 dark:hover:bg-accent-900/20"
                     >
@@ -339,7 +339,9 @@ const ProductDetail = () => {
                     {/* Quick Add Button */}
                     <button
                       onClick={() => {
-                        toast.success(`Related Dish ${item} added to cart!`);
+                        // Simulate adding related dish to cart
+                        // In a real app, you would have the actual product data
+                        console.log(`Related Dish ${item} would be added to cart`);
                       }}
                       className="absolute bottom-4 right-4 bg-white dark:bg-dark-800 text-primary-600 dark:text-accent-400 p-3 rounded-full shadow-lg transform translate-y-12 group-hover:translate-y-0 transition-all duration-500 hover:bg-primary-50 dark:hover:bg-accent-900/20"
                     >

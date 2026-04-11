@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Camera, Save, Eye, EyeOff, User, Mail, Phone, MapPin, Lock } from 'lucide-react';
 import DashboardLayout from '../../components/admin/DashboardLayout';
 import Modal from '../../components/common/Modal';
 import { useAuth } from '../../contexts/AuthContext';
+import toast from 'react-hot-toast';
 
 const AdminProfile = () => {
   const { user, updateUser } = useAuth();
@@ -28,6 +29,28 @@ const AdminProfile = () => {
     newPassword: '',
     confirmPassword: ''
   });
+
+  // Load saved profile data on component mount
+  useEffect(() => {
+    if (user?.id) {
+      // Load saved profile image
+      const savedImage = localStorage.getItem(`admin_profile_image_${user.id}`);
+      if (savedImage) {
+        setProfileImagePreview(savedImage);
+      }
+      
+      // Load saved profile data
+      const savedProfile = localStorage.getItem(`admin_profile_${user.id}`);
+      if (savedProfile) {
+        try {
+          const profileData = JSON.parse(savedProfile);
+          setFormData(prev => ({ ...prev, ...profileData }));
+        } catch (error) {
+          console.error('Failed to load saved profile:', error);
+        }
+      }
+    }
+  }, [user?.id]);
 
   const handleInputChange = (e) => {
     setFormData({
@@ -74,28 +97,28 @@ const AdminProfile = () => {
   const handleSaveProfile = async (e) => {
     e.preventDefault();
     try {
-      // For demo purposes, we'll simulate a successful update
-      // In a real app, you would call the API to update profile
-      
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Update local user data (in a real app, this would come from the API response)
-      const updatedUser = { ...user, ...formData };
-      
       // Handle profile image upload if there's a new image
       if (profileImage) {
-        // In a real app, you would upload the image to the server
-        console.log('Upload profile image:', profileImage);
-        // For demo, we'll just use the preview URL
-        updatedUser.profileImage = profileImagePreview;
+        // Store the image in localStorage for demo purposes
+        // In a real app, you would upload to a server
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          localStorage.setItem(`admin_profile_image_${user.id}`, reader.result);
+          setProfileImagePreview(reader.result);
+        };
+        reader.readAsDataURL(profileImage);
       }
       
-      // Update the auth context (simulate successful API response)
-      // await updateUser(formData);
+      // Store profile data in localStorage
+      const updatedProfile = { ...formData };
+      localStorage.setItem(`admin_profile_${user.id}`, JSON.stringify(updatedProfile));
       
       setIsEditing(false);
       setShowSuccessModal(true);
+      toast.success('Profile updated successfully!');
     } catch (error) {
       console.error('Profile update error:', error);
       setErrorMessage('Failed to update profile. Please try again.');
