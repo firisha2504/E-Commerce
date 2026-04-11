@@ -41,7 +41,7 @@ const Cart = () => {
   };
 
   const calculateSubtotal = () => {
-    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    return cartItems.reduce((total, item) => total + (Number(item.price) * item.quantity), 0);
   };
 
   const calculateTax = () => {
@@ -90,7 +90,7 @@ const Cart = () => {
                         <div className="w-20 h-20 bg-gray-200 dark:bg-dark-700 rounded-lg"></div>
                         <div>
                           <h3 className="font-medium text-gray-900 dark:text-gray-100">{item.name}</h3>
-                          <p className="text-gray-600 dark:text-gray-400 text-sm">${item.price.toFixed(2)} each</p>
+                          <p className="text-gray-600 dark:text-gray-400 text-sm">${Number(item.price).toFixed(2)} each</p>
                         </div>
                       </div>
                       
@@ -111,7 +111,7 @@ const Cart = () => {
                           </button>
                         </div>
                         <div className="text-right">
-                          <p className="font-semibold text-gray-900 dark:text-gray-100">${(item.price * item.quantity).toFixed(2)}</p>
+                          <p className="font-semibold text-gray-900 dark:text-gray-100">${(Number(item.price) * item.quantity).toFixed(2)}</p>
                           <button 
                             onClick={() => handleRemoveItem(item.id)}
                             className="text-red-500 hover:text-red-700 text-sm flex items-center"
@@ -147,10 +147,13 @@ const Cart = () => {
                 </div>
               </div>
 
-              <button className="w-full bg-primary-600 dark:bg-accent-500 text-white py-3 rounded-lg font-medium hover:bg-primary-700 dark:hover:bg-accent-600 transition-colors flex items-center justify-center space-x-2">
+              <Link
+                to="/checkout"
+                className="w-full bg-primary-600 dark:bg-accent-500 text-white py-3 rounded-lg font-medium hover:bg-primary-700 dark:hover:bg-accent-600 transition-colors flex items-center justify-center space-x-2"
+              >
                 <span>Proceed to Checkout</span>
                 <ArrowRight size={20} />
-              </button>
+              </Link>
               
               <button 
                 onClick={handleClearCart}

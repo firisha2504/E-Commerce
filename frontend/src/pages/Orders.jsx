@@ -1,20 +1,39 @@
-import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Package, Clock, CheckCircle, XCircle, Truck, ChevronRight } from 'lucide-react';
-import { ordersAPI } from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
 
 const Orders = () => {
   const [statusFilter, setStatusFilter] = useState('all');
+  const [orders, setOrders] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuth();
 
-  const { data: orders, isLoading } = useQuery({
-    queryKey: ['orders', statusFilter],
-    queryFn: async () => {
-      const params = statusFilter !== 'all' ? { status: statusFilter } : {};
-      const response = await ordersAPI.getAll(params);
-      return response.data;
-    },
-  });
+  useEffect(() => {
+    const loadOrders = () => {
+      try {
+        const allOrders = JSON.parse(localStorage.getItem('orders') || '[]');
+        // Filter orders for current user
+        const userOrders = allOrders.filter(order => order.userId === user?.id);
+        setOrders(userOrders);
+      } catch (error) {
+        console.error('Failed to load orders:', error);
+        setOrders([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (user) {
+      loadOrders();
+    } else {
+      setIsLoading(false);
+    }
+  }, [user]);
+
+  const filteredOrders = statusFilter === 'all' 
+    ? orders 
+    : orders.filter(order => order.status === statusFilter);
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -108,11 +127,11 @@ const Orders = () => {
         </div>
 
         {/* Orders List */}
-        {orders?.orders && orders.orders.length > 0 ? (
+        {filteredOrders.length > 0 ? (
           <div className="space-y-4">
-            {orders.orders.map((order) => (
+            {filteredOrders.map((order) => (
               <div
-                key={order.id}
+                key={order.orderId}
                 className="bg-white dark:bg-dark-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
               >
                 <div className="p-6">
@@ -121,7 +140,7 @@ const Orders = () => {
                       {getStatusIcon(order.status)}
                       <div>
                         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                          Order #{order.id.slice(0, 8)}
+                          Order #{order.orderId}
                         </h3>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                           {new Date(order.createdAt).toLocaleDateString('en-US', {
@@ -138,28 +157,67 @@ const Orders = () => {
                       <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>
                         {getStatusText(order.status)}
                       </span>
-                      <Link
-                        to={`/orders/${order.id}`}
-                        className="text-primary-600 dark:text-accent-400 hover:text-primary-700 dark:hover:text-accent-300 flex items-center"
-                      >
-                        View Details
-                        <ChevronRight size={20} />
-                      </Link>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                        {order.paymentMethod === 'card' ? 'Card Payment' : 'Cash on Delivery'}
+                      </span>
                     </div>
                   </div>
 
                   <div className="border-t border-gray-200 dark:border-dark-700 pt-4">
-                    <div className="flex justify-between items-center">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-2">Items Ordered:</h4>
+                        <div className="space-y-1">
+                          {order.items.slice(0, 3).map((item, index) => (
+                            <p key={index} className="text-sm text-gray-600 dark:text-gray-400">
+                              {item.quantity}x {item.name} - ${(Number(item.price) * item.quantity).toFixed(2)}
+                            </p>
+                          ))}
+                          {order.items.length > 3 && (
+                            <p className="text-sm text-gray-500 dark:text-gray-500">
+                              +{order.items.length - 3} more items
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-2">Delivery Address:</h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          {order.deliveryInfo.fullName}<br />
+                          {order.deliveryInfo.address}<br />
+                          {order.deliveryInfo.city}, {order.deliveryInfo.zipCode}<br />
+                          {order.deliveryInfo.phone}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex justify-between items-center border-t border-gray-200 dark:border-dark-700 pt-4">
                       <div>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {order.items?.length || 0} item(s)
+                          {order.items.length} item(s)
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Total Amount</p>
-                        <p className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                          ${order.totalAmount?.toFixed(2) || '0.00'}
-                        </p>
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-600 dark:text-gray-400">Subtotal:</span>
+                            <span className="text-gray-900 dark:text-gray-100">${order.subtotal.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-600 dark:text-gray-400">Tax:</span>
+                            <span className="text-gray-900 dark:text-gray-100">${order.tax.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-600 dark:text-gray-400">Delivery:</span>
+                            <span className="text-gray-900 dark:text-gray-100">
+                              {order.deliveryFee === 0 ? 'FREE' : `$${order.deliveryFee.toFixed(2)}`}
+                            </span>
+                          </div>
+                          <div className="flex justify-between font-bold">
+                            <span className="text-gray-900 dark:text-gray-100">Total:</span>
+                            <span className="text-gray-900 dark:text-gray-100">${order.total.toFixed(2)}</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>

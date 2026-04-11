@@ -36,7 +36,7 @@ const cartReducer = (state, action) => {
       }
       
       const newItemCount = newItems.reduce((total, item) => total + item.quantity, 0);
-      const newTotal = newItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+      const newTotal = newItems.reduce((total, item) => total + (Number(item.price) * item.quantity), 0);
       
       return {
         ...state,
@@ -49,7 +49,7 @@ const cartReducer = (state, action) => {
         item.id === action.payload.id ? action.payload : item
       );
       const updatedItemCount = updatedItems.reduce((total, item) => total + item.quantity, 0);
-      const updatedTotal = updatedItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+      const updatedTotal = updatedItems.reduce((total, item) => total + (Number(item.price) * item.quantity), 0);
       
       return {
         ...state,
@@ -60,7 +60,7 @@ const cartReducer = (state, action) => {
     case 'REMOVE_ITEM':
       const filteredItems = state.items.filter(item => item.id !== action.payload);
       const filteredItemCount = filteredItems.reduce((total, item) => total + item.quantity, 0);
-      const filteredTotal = filteredItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+      const filteredTotal = filteredItems.reduce((total, item) => total + (Number(item.price) * item.quantity), 0);
       
       return {
         ...state,
@@ -141,7 +141,7 @@ export const CartProvider = ({ children }) => {
         id: `${product.id}_${Date.now()}`, // Unique ID for cart item
         productId: product.id,
         name: product.name,
-        price: product.price,
+        price: Number(product.price) || 0, // Ensure price is a number
         image: product.image,
         quantity: quantity,
         customizations: customizations,
