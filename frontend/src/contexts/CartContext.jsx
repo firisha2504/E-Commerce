@@ -148,7 +148,7 @@ export const CartProvider = ({ children }) => {
       };
       
       dispatch({ type: 'ADD_ITEM', payload: cartItem });
-      toast.success('Item added to cart');
+      // Removed duplicate toast - let components handle their own notifications
     } catch (error) {
       console.error('Failed to add to cart:', error);
       toast.error('Failed to add item to cart');
@@ -161,7 +161,7 @@ export const CartProvider = ({ children }) => {
       if (item) {
         const updatedItem = { ...item, quantity };
         dispatch({ type: 'UPDATE_ITEM', payload: updatedItem });
-        toast.success('Cart updated');
+        // Removed duplicate toast - let components handle their own notifications
       }
     } catch (error) {
       console.error('Failed to update cart item:', error);
@@ -172,7 +172,7 @@ export const CartProvider = ({ children }) => {
   const removeFromCart = async (itemId) => {
     try {
       dispatch({ type: 'REMOVE_ITEM', payload: itemId });
-      toast.success('Item removed from cart');
+      // Removed duplicate toast - let components handle their own notifications
     } catch (error) {
       console.error('Failed to remove from cart:', error);
       toast.error('Failed to remove item');
@@ -185,7 +185,7 @@ export const CartProvider = ({ children }) => {
       if (isAuthenticated && user) {
         localStorage.removeItem(`cart_${user.id}`);
       }
-      toast.success('Cart cleared');
+      // Removed duplicate toast - let components handle their own notifications
     } catch (error) {
       console.error('Failed to clear cart:', error);
       toast.error('Failed to clear cart');

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ShoppingCart, Trash2, Plus, Minus, ArrowRight } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import Modal from '../components/common/Modal';
+import toast from 'react-hot-toast';
 
 const Cart = () => {
   const { cartItems, total, itemCount, removeFromCart, updateCartItem, clearCart } = useCart();
@@ -13,8 +14,10 @@ const Cart = () => {
   const handleQuantityChange = (itemId, newQuantity) => {
     if (newQuantity < 1) {
       removeFromCart(itemId);
+      toast.success('Item removed from cart');
     } else {
       updateCartItem(itemId, newQuantity);
+      toast.success('Cart updated');
     }
   };
 
@@ -26,6 +29,7 @@ const Cart = () => {
   const confirmRemoveItem = () => {
     if (itemToRemove) {
       removeFromCart(itemToRemove);
+      toast.success('Item removed from cart');
       setShowConfirmModal(false);
       setItemToRemove(null);
     }
@@ -37,6 +41,7 @@ const Cart = () => {
 
   const confirmClearCart = () => {
     clearCart();
+    toast.success('Cart cleared');
     setShowClearModal(false);
   };
 
