@@ -24,11 +24,10 @@ const Checkout = () => {
     zipCode: '',
     
     // Payment Information
-    paymentMethod: 'card',
-    cardNumber: '',
-    expiryDate: '',
-    cvv: '',
-    cardName: '',
+    paymentMethod: 'cbe',
+    accountNumber: '',
+    phoneNumber: '',
+    referenceNumber: '',
     
     // Order Notes
     orderNotes: ''
@@ -58,11 +57,23 @@ const Checkout = () => {
     return calculateSubtotal() + calculateTax() + calculateDeliveryFee();
   };
 
+  const getPaymentMethodName = (method) => {
+    switch (method) {
+      case 'cbe': return 'CBE Bank';
+      case 'awash': return 'Awash Bank';
+      case 'telebirr': return 'TeleBirr';
+      case 'ebirr': return 'E-Birr';
+      default: return method;
+    }
+  };
+
   const validateForm = () => {
     const required = ['fullName', 'email', 'phone', 'address', 'city', 'zipCode'];
     
-    if (formData.paymentMethod === 'card') {
-      required.push('cardNumber', 'expiryDate', 'cvv', 'cardName');
+    if (formData.paymentMethod === 'cbe' || formData.paymentMethod === 'awash') {
+      required.push('accountNumber');
+    } else if (formData.paymentMethod === 'telebirr' || formData.paymentMethod === 'ebirr') {
+      required.push('phoneNumber');
     }
 
     for (let field of required) {
@@ -82,6 +93,12 @@ const Checkout = () => {
     // Basic phone validation
     if (formData.phone.length < 10) {
       toast.error('Please enter a valid phone number');
+      return false;
+    }
+
+    // Payment method specific validation
+    if ((formData.paymentMethod === 'telebirr' || formData.paymentMethod === 'ebirr') && formData.phoneNumber.length < 10) {
+      toast.error('Please enter a valid payment phone number');
       return false;
     }
 
@@ -120,6 +137,11 @@ const Checkout = () => {
           zipCode: formData.zipCode
         },
         paymentMethod: formData.paymentMethod,
+        paymentDetails: {
+          accountNumber: formData.accountNumber,
+          phoneNumber: formData.phoneNumber,
+          referenceNumber: formData.referenceNumber
+        },
         orderNotes: formData.orderNotes,
         status: 'confirmed',
         createdAt: new Date().toISOString()
@@ -292,91 +314,154 @@ const Checkout = () => {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Payment Method
                 </label>
-                <div className="space-y-2">
-                  <label className="flex items-center">
+                <div className="grid grid-cols-2 gap-3">
+                  <label className="flex items-center p-3 border border-gray-300 dark:border-dark-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-dark-700">
                     <input
                       type="radio"
                       name="paymentMethod"
-                      value="card"
-                      checked={formData.paymentMethod === 'card'}
+                      value="cbe"
+                      checked={formData.paymentMethod === 'cbe'}
                       onChange={handleInputChange}
-                      className="mr-2"
+                      className="mr-3"
                     />
-                    <span className="text-gray-900 dark:text-gray-100">Credit/Debit Card</span>
+                    <div>
+                      <span className="font-medium text-gray-900 dark:text-gray-100">CBE Bank</span>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Commercial Bank of Ethiopia</p>
+                    </div>
                   </label>
-                  <label className="flex items-center">
+                  
+                  <label className="flex items-center p-3 border border-gray-300 dark:border-dark-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-dark-700">
                     <input
                       type="radio"
                       name="paymentMethod"
-                      value="cash"
-                      checked={formData.paymentMethod === 'cash'}
+                      value="awash"
+                      checked={formData.paymentMethod === 'awash'}
                       onChange={handleInputChange}
-                      className="mr-2"
+                      className="mr-3"
                     />
-                    <span className="text-gray-900 dark:text-gray-100">Cash on Delivery</span>
+                    <div>
+                      <span className="font-medium text-gray-900 dark:text-gray-100">Awash Bank</span>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Awash International Bank</p>
+                    </div>
+                  </label>
+                  
+                  <label className="flex items-center p-3 border border-gray-300 dark:border-dark-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-dark-700">
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="telebirr"
+                      checked={formData.paymentMethod === 'telebirr'}
+                      onChange={handleInputChange}
+                      className="mr-3"
+                    />
+                    <div>
+                      <span className="font-medium text-gray-900 dark:text-gray-100">TeleBirr</span>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Mobile Money</p>
+                    </div>
+                  </label>
+                  
+                  <label className="flex items-center p-3 border border-gray-300 dark:border-dark-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-dark-700">
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="ebirr"
+                      checked={formData.paymentMethod === 'ebirr'}
+                      onChange={handleInputChange}
+                      className="mr-3"
+                    />
+                    <div>
+                      <span className="font-medium text-gray-900 dark:text-gray-100">E-Birr</span>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Digital Wallet</p>
+                    </div>
                   </label>
                 </div>
               </div>
 
-              {formData.paymentMethod === 'card' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="md:col-span-2">
+              {/* Bank Account Payment Fields */}
+              {(formData.paymentMethod === 'cbe' || formData.paymentMethod === 'awash') && (
+                <div className="space-y-4">
+                  <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Card Number *
+                      Account Number *
                     </label>
                     <input
                       type="text"
-                      name="cardNumber"
-                      value={formData.cardNumber}
+                      name="accountNumber"
+                      value={formData.accountNumber}
                       onChange={handleInputChange}
-                      placeholder="1234 5678 9012 3456"
+                      placeholder="Enter your account number"
                       className="w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-accent-500 focus:border-transparent bg-white dark:bg-dark-700 text-gray-900 dark:text-gray-100"
-                      required={formData.paymentMethod === 'card'}
+                      required
                     />
                   </div>
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Expiry Date *
+                      Reference Number (Optional)
                     </label>
                     <input
                       type="text"
-                      name="expiryDate"
-                      value={formData.expiryDate}
+                      name="referenceNumber"
+                      value={formData.referenceNumber}
                       onChange={handleInputChange}
-                      placeholder="MM/YY"
+                      placeholder="Transaction reference number"
                       className="w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-accent-500 focus:border-transparent bg-white dark:bg-dark-700 text-gray-900 dark:text-gray-100"
-                      required={formData.paymentMethod === 'card'}
+                    />
+                  </div>
+                  
+                  <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                    <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-2">Payment Instructions:</h4>
+                    <ol className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+                      <li>1. Transfer the total amount to our {formData.paymentMethod === 'cbe' ? 'CBE' : 'Awash'} account</li>
+                      <li>2. Use your order ID as reference</li>
+                      <li>3. Enter your account number above</li>
+                      <li>4. Keep the transaction receipt for verification</li>
+                    </ol>
+                  </div>
+                </div>
+              )}
+
+              {/* Mobile Money Payment Fields */}
+              {(formData.paymentMethod === 'telebirr' || formData.paymentMethod === 'ebirr') && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Phone Number *
+                    </label>
+                    <input
+                      type="tel"
+                      name="phoneNumber"
+                      value={formData.phoneNumber}
+                      onChange={handleInputChange}
+                      placeholder="+251 9XX XXX XXX"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-accent-500 focus:border-transparent bg-white dark:bg-dark-700 text-gray-900 dark:text-gray-100"
+                      required
                     />
                   </div>
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      CVV *
+                      Reference Number (Optional)
                     </label>
                     <input
                       type="text"
-                      name="cvv"
-                      value={formData.cvv}
+                      name="referenceNumber"
+                      value={formData.referenceNumber}
                       onChange={handleInputChange}
-                      placeholder="123"
+                      placeholder="Transaction reference number"
                       className="w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-accent-500 focus:border-transparent bg-white dark:bg-dark-700 text-gray-900 dark:text-gray-100"
-                      required={formData.paymentMethod === 'card'}
                     />
                   </div>
                   
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Cardholder Name *
-                    </label>
-                    <input
-                      type="text"
-                      name="cardName"
-                      value={formData.cardName}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-accent-500 focus:border-transparent bg-white dark:bg-dark-700 text-gray-900 dark:text-gray-100"
-                      required={formData.paymentMethod === 'card'}
-                    />
+                  <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                    <h4 className="font-medium text-green-900 dark:text-green-100 mb-2">Payment Instructions:</h4>
+                    <ol className="text-sm text-green-800 dark:text-green-200 space-y-1">
+                      <li>1. Open your {formData.paymentMethod === 'telebirr' ? 'TeleBirr' : 'E-Birr'} app</li>
+                      <li>2. Send money to our merchant number</li>
+                      <li>3. Use the total amount: ${calculateTotal().toFixed(2)}</li>
+                      <li>4. Enter your phone number above</li>
+                      <li>5. Save the transaction ID for reference</li>
+                    </ol>
                   </div>
                 </div>
               )}
@@ -419,6 +504,10 @@ const Checkout = () => {
               </div>
               
               <div className="border-t border-gray-200 dark:border-dark-700 pt-4 space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-600 dark:text-gray-400">Payment Method</span>
+                  <span className="text-gray-900 dark:text-gray-100">{getPaymentMethodName(formData.paymentMethod)}</span>
+                </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600 dark:text-gray-400">Subtotal</span>
                   <span className="text-gray-900 dark:text-gray-100">${calculateSubtotal().toFixed(2)}</span>
@@ -472,7 +561,34 @@ const Checkout = () => {
           <div className="bg-gray-50 dark:bg-dark-700 rounded-lg p-4 mb-6">
             <p className="text-sm text-gray-600 dark:text-gray-400">Order ID</p>
             <p className="font-mono font-semibold text-gray-900 dark:text-gray-100">{orderId}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Payment Method</p>
+            <p className="font-medium text-gray-900 dark:text-gray-100">{getPaymentMethodName(formData.paymentMethod)}</p>
           </div>
+          
+          {(formData.paymentMethod === 'cbe' || formData.paymentMethod === 'awash') && (
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+              <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-2">Next Steps:</h4>
+              <ol className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+                <li>1. Transfer ${calculateTotal().toFixed(2)} to our {getPaymentMethodName(formData.paymentMethod)} account</li>
+                <li>2. Use order ID: {orderId} as reference</li>
+                <li>3. Keep your transaction receipt</li>
+                <li>4. Your order will be confirmed once payment is verified</li>
+              </ol>
+            </div>
+          )}
+          
+          {(formData.paymentMethod === 'telebirr' || formData.paymentMethod === 'ebirr') && (
+            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-6">
+              <h4 className="font-medium text-green-900 dark:text-green-100 mb-2">Next Steps:</h4>
+              <ol className="text-sm text-green-800 dark:text-green-200 space-y-1">
+                <li>1. Open your {getPaymentMethodName(formData.paymentMethod)} app</li>
+                <li>2. Send ${calculateTotal().toFixed(2)} to our merchant number</li>
+                <li>3. Use order ID: {orderId} as reference</li>
+                <li>4. Save the transaction ID</li>
+                <li>5. Your order will be confirmed once payment is received</li>
+              </ol>
+            </div>
+          )}
           <button
             onClick={handleSuccessClose}
             className="w-full bg-primary-600 dark:bg-accent-500 text-white py-2 rounded-lg font-medium hover:bg-primary-700 dark:hover:bg-accent-600 transition-colors"

@@ -107,9 +107,26 @@ const AdminOrders = () => {
   };
 
   const getPaymentIcon = (paymentMethod) => {
-    return paymentMethod === 'card' 
-      ? <CreditCard size={16} className="text-blue-500" />
-      : <Banknote size={16} className="text-green-500" />;
+    switch (paymentMethod) {
+      case 'cbe':
+      case 'awash':
+        return <CreditCard size={16} className="text-blue-500" />;
+      case 'telebirr':
+      case 'ebirr':
+        return <Banknote size={16} className="text-green-500" />;
+      default:
+        return <CreditCard size={16} className="text-gray-500" />;
+    }
+  };
+
+  const getPaymentMethodName = (paymentMethod) => {
+    switch (paymentMethod) {
+      case 'cbe': return 'CBE Bank';
+      case 'awash': return 'Awash Bank';
+      case 'telebirr': return 'TeleBirr';
+      case 'ebirr': return 'E-Birr';
+      default: return paymentMethod;
+    }
   };
 
   const getTotalRevenue = () => {
@@ -282,7 +299,7 @@ const AdminOrders = () => {
                       <div className="flex items-center space-x-2">
                         {getPaymentIcon(order.paymentMethod)}
                         <span className="text-sm text-gray-900 dark:text-white">
-                          {order.paymentMethod === 'card' ? 'Card' : 'Cash'}
+                          {getPaymentMethodName(order.paymentMethod)}
                         </span>
                       </div>
                     </td>
@@ -373,7 +390,7 @@ const AdminOrders = () => {
                 <div className="flex items-center space-x-2">
                   {getPaymentIcon(selectedOrder.paymentMethod)}
                   <span className="text-sm font-medium">
-                    {selectedOrder.paymentMethod === 'card' ? 'Credit/Debit Card' : 'Cash on Delivery'}
+                    {getPaymentMethodName(selectedOrder.paymentMethod)}
                   </span>
                 </div>
               </div>

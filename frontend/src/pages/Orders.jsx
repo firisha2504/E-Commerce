@@ -158,7 +158,10 @@ const Orders = () => {
                         {getStatusText(order.status)}
                       </span>
                       <span className="text-sm text-gray-600 dark:text-gray-400">
-                        {order.paymentMethod === 'card' ? 'Card Payment' : 'Cash on Delivery'}
+                        {order.paymentMethod === 'cbe' ? 'CBE Bank' : 
+                         order.paymentMethod === 'awash' ? 'Awash Bank' :
+                         order.paymentMethod === 'telebirr' ? 'TeleBirr' :
+                         order.paymentMethod === 'ebirr' ? 'E-Birr' : order.paymentMethod}
                       </span>
                     </div>
                   </div>
