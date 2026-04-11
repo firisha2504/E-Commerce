@@ -114,6 +114,8 @@ const AdminOrders = () => {
       case 'telebirr':
       case 'ebirr':
         return <Banknote size={16} className="text-green-500" />;
+      case 'cash':
+        return <Banknote size={16} className="text-orange-500" />;
       default:
         return <CreditCard size={16} className="text-gray-500" />;
     }
@@ -125,6 +127,7 @@ const AdminOrders = () => {
       case 'awash': return 'Awash Bank';
       case 'telebirr': return 'TeleBirr';
       case 'ebirr': return 'E-Birr';
+      case 'cash': return 'Cash on Delivery';
       default: return paymentMethod;
     }
   };

@@ -63,6 +63,7 @@ const Checkout = () => {
       case 'awash': return 'Awash Bank';
       case 'telebirr': return 'TeleBirr';
       case 'ebirr': return 'E-Birr';
+      case 'cash': return 'Cash on Delivery';
       default: return method;
     }
   };
@@ -374,6 +375,21 @@ const Checkout = () => {
                       <p className="text-xs text-gray-500 dark:text-gray-400">Digital Wallet</p>
                     </div>
                   </label>
+                  
+                  <label className="flex items-center p-3 border border-gray-300 dark:border-dark-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-dark-700 col-span-2">
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="cash"
+                      checked={formData.paymentMethod === 'cash'}
+                      onChange={handleInputChange}
+                      className="mr-3"
+                    />
+                    <div>
+                      <span className="font-medium text-gray-900 dark:text-gray-100">Cash on Delivery</span>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Pay when your order arrives</p>
+                    </div>
+                  </label>
                 </div>
               </div>
 
@@ -463,6 +479,19 @@ const Checkout = () => {
                       <li>5. Save the transaction ID for reference</li>
                     </ol>
                   </div>
+                </div>
+              )}
+
+              {/* Cash on Delivery Information */}
+              {formData.paymentMethod === 'cash' && (
+                <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-4">
+                  <h4 className="font-medium text-orange-900 dark:text-orange-100 mb-2">Cash on Delivery:</h4>
+                  <ul className="text-sm text-orange-800 dark:text-orange-200 space-y-1">
+                    <li>• Pay ${calculateTotal().toFixed(2)} when your order arrives</li>
+                    <li>• Have exact change ready for faster service</li>
+                    <li>• Our delivery person will provide a receipt</li>
+                    <li>• No advance payment required</li>
+                  </ul>
                 </div>
               )}
             </div>
@@ -587,6 +616,19 @@ const Checkout = () => {
                 <li>4. Save the transaction ID</li>
                 <li>5. Your order will be confirmed once payment is received</li>
               </ol>
+            </div>
+          )}
+
+          {formData.paymentMethod === 'cash' && (
+            <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-4 mb-6">
+              <h4 className="font-medium text-orange-900 dark:text-orange-100 mb-2">Next Steps:</h4>
+              <ul className="text-sm text-orange-800 dark:text-orange-200 space-y-1">
+                <li>• Your order is confirmed and being prepared</li>
+                <li>• Prepare ${calculateTotal().toFixed(2)} in cash</li>
+                <li>• Our delivery person will contact you</li>
+                <li>• Pay when your order arrives at your door</li>
+                <li>• You'll receive a receipt upon payment</li>
+              </ul>
             </div>
           )}
           <button

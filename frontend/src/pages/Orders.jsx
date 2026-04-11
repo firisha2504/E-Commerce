@@ -161,7 +161,8 @@ const Orders = () => {
                         {order.paymentMethod === 'cbe' ? 'CBE Bank' : 
                          order.paymentMethod === 'awash' ? 'Awash Bank' :
                          order.paymentMethod === 'telebirr' ? 'TeleBirr' :
-                         order.paymentMethod === 'ebirr' ? 'E-Birr' : order.paymentMethod}
+                         order.paymentMethod === 'ebirr' ? 'E-Birr' :
+                         order.paymentMethod === 'cash' ? 'Cash on Delivery' : order.paymentMethod}
                       </span>
                     </div>
                   </div>
