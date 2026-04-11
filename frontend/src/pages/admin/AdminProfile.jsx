@@ -6,7 +6,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import toast from 'react-hot-toast';
 
 const AdminProfile = () => {
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, updateProfileImage } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -106,8 +106,11 @@ const AdminProfile = () => {
         // In a real app, you would upload to a server
         const reader = new FileReader();
         reader.onloadend = () => {
-          localStorage.setItem(`admin_profile_image_${user.id}`, reader.result);
-          setProfileImagePreview(reader.result);
+          const imageUrl = reader.result;
+          localStorage.setItem(`admin_profile_image_${user.id}`, imageUrl);
+          setProfileImagePreview(imageUrl);
+          // Update the user context with the new profile image
+          updateProfileImage(imageUrl);
         };
         reader.readAsDataURL(profileImage);
       }

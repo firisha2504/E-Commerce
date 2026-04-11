@@ -68,9 +68,19 @@ export const AuthProvider = ({ children }) => {
       if (token) {
         try {
           const response = await authAPI.getProfile();
+          let user = response.data.user;
+          
+          // Load saved profile image from localStorage
+          if (user?.id) {
+            const savedImage = localStorage.getItem(`admin_profile_image_${user.id}`);
+            if (savedImage) {
+              user = { ...user, profileImage: savedImage };
+            }
+          }
+          
           dispatch({
             type: 'LOGIN_SUCCESS',
-            payload: { user: response.data.user, token },
+            payload: { user, token },
           });
         } catch (error) {
           dispatch({ type: 'LOGIN_FAILURE' });
@@ -87,10 +97,20 @@ export const AuthProvider = ({ children }) => {
     dispatch({ type: 'LOGIN_START' });
     try {
       const response = await authAPI.login({ email, password });
+      let user = response.data.user;
+      
+      // Load saved profile image from localStorage after login
+      if (user?.id) {
+        const savedImage = localStorage.getItem(`admin_profile_image_${user.id}`);
+        if (savedImage) {
+          user = { ...user, profileImage: savedImage };
+        }
+      }
+      
       dispatch({
         type: 'LOGIN_SUCCESS',
         payload: {
-          user: response.data.user,
+          user,
           token: response.data.token,
         },
       });
@@ -131,12 +151,18 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateProfileImage = (imageUrl) => {
+    const updatedUser = { ...state.user, profileImage: imageUrl };
+    dispatch({ type: 'UPDATE_USER', payload: updatedUser });
+  };
+
   const value = {
     ...state,
     login,
     register,
     logout,
     updateUser,
+    updateProfileImage,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
