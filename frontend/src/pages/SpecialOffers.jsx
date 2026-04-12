@@ -95,7 +95,7 @@ const SpecialOffers = () => {
               </p>
               <div className="flex flex-wrap gap-4">
                 <Link
-                  to="/products"
+                  to="/products?promo=GRAND25"
                   className="bg-white text-primary-600 dark:text-accent-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-flex items-center"
                 >
                   Order Now
@@ -124,6 +124,25 @@ const SpecialOffers = () => {
 
         {/* Offers Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {/* Debug info */}
+          <div className="col-span-full bg-yellow-100 dark:bg-yellow-900/20 border border-yellow-400 rounded-lg p-4 mb-4">
+            <h3 className="font-bold text-yellow-800 dark:text-yellow-400 mb-2">🐛 Debug Info:</h3>
+            <p className="text-sm text-yellow-700 dark:text-yellow-300">
+              Total offers in localStorage: {JSON.parse(localStorage.getItem('specialOffers') || '[]').length}<br/>
+              Active offers displayed: {offers.length}<br/>
+              Current date: {new Date().toISOString().split('T')[0]}
+            </p>
+            <button
+              onClick={() => {
+                localStorage.removeItem('specialOffers');
+                window.location.reload();
+              }}
+              className="mt-2 bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-yellow-700"
+            >
+              🔄 Reset Offers & Reload
+            </button>
+          </div>
+          
           {offers.map((offer) => (
             <div
               key={offer.id}
@@ -182,7 +201,7 @@ const SpecialOffers = () => {
                 </div>
 
                 <Link
-                  to="/products"
+                  to={`/products?promo=${offer.promoCode}`}
                   className="w-full bg-primary-600 dark:bg-accent-500 text-white py-3 px-4 rounded-lg font-medium hover:bg-primary-700 dark:hover:bg-accent-600 transition-colors flex items-center justify-center"
                 >
                   Order Now

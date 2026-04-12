@@ -5,45 +5,33 @@ const NotificationCenter = () => {
   const [notifications, setNotifications] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
 
-  // Load notifications from localStorage on mount
-  useEffect(() => {
-    loadNotifications();
-  }, []);
+
 
   const loadNotifications = () => {
     try {
       const savedNotifications = JSON.parse(localStorage.getItem('userNotifications') || '[]');
-      
-      // Add some sample notifications if none exist (for demo purposes)
-      if (savedNotifications.length === 0) {
-        const sampleNotifications = [
-          {
-            id: Date.now() + 1,
-            type: 'success',
-            title: 'Welcome!',
-            message: 'Welcome to FA Restaurant! Explore our delicious Ethiopian cuisine.',
-            timestamp: new Date().toISOString(),
-            read: false
-          },
-          {
-            id: Date.now() + 2,
-            type: 'info',
-            title: 'Special Offers Available',
-            message: 'Check out our latest special offers and save on your next order!',
-            timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString(), // 30 minutes ago
-            read: false
-          }
-        ];
-        localStorage.setItem('userNotifications', JSON.stringify(sampleNotifications));
-        setNotifications(sampleNotifications);
-      } else {
-        setNotifications(savedNotifications);
-      }
+      setNotifications(savedNotifications);
     } catch (error) {
       console.error('Failed to load notifications:', error);
       setNotifications([]);
     }
   };
+
+  // Clear any existing sample notifications on component mount
+  useEffect(() => {
+    // Clear old sample notifications if they exist
+    const existingNotifications = JSON.parse(localStorage.getItem('userNotifications') || '[]');
+    const filteredNotifications = existingNotifications.filter(notification => 
+      notification.title !== 'Welcome!' && 
+      notification.title !== 'Special Offers Available'
+    );
+    
+    if (filteredNotifications.length !== existingNotifications.length) {
+      localStorage.setItem('userNotifications', JSON.stringify(filteredNotifications));
+    }
+    
+    loadNotifications();
+  }, []);
 
   const saveNotifications = (updatedNotifications) => {
     try {

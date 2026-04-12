@@ -81,15 +81,6 @@ const Home = () => {
             </Link>
           </div>
         </div>
-        
-        {/* Promotional Banner */}
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
-          <div className="bg-primary-600 text-white py-4 px-6 rounded-lg text-center shadow-xl">
-            <p className="text-lg font-semibold">
-              Order Now & Get 15% Off Your First Order!
-            </p>
-          </div>
-        </div>
       </section>
 
       {/* Features Section */}

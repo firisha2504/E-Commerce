@@ -29,14 +29,35 @@ const AdminSpecialOffers = () => {
     minOrderAmount: '',
     maxDiscount: '',
     usageLimit: '',
-    image: ''
+    image: '',
+    applicationType: 'order', // 'order' or 'product'
+    targetProducts: [] // Array of product IDs for product-specific discounts
   });
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
+  const [availableProducts, setAvailableProducts] = useState([]);
 
   useEffect(() => {
     loadOffers();
+    loadProducts();
   }, []);
+
+  const loadProducts = () => {
+    // Load sample products for selection
+    const sampleProducts = [
+      { id: 1, name: 'Margherita Pizza', category: 'Pizza', price: 250 },
+      { id: 2, name: 'Pepperoni Pizza', category: 'Pizza', price: 300 },
+      { id: 3, name: 'Chicken Burger', category: 'Burgers', price: 180 },
+      { id: 4, name: 'Beef Burger', category: 'Burgers', price: 220 },
+      { id: 5, name: 'Caesar Salad', category: 'Salads', price: 120 },
+      { id: 6, name: 'Greek Salad', category: 'Salads', price: 140 },
+      { id: 7, name: 'Pasta Carbonara', category: 'Pasta', price: 200 },
+      { id: 8, name: 'Pasta Bolognese', category: 'Pasta', price: 210 },
+      { id: 9, name: 'Coca Cola', category: 'Beverages', price: 25 },
+      { id: 10, name: 'Fresh Orange Juice', category: 'Beverages', price: 35 }
+    ];
+    setAvailableProducts(sampleProducts);
+  };
 
   const loadOffers = () => {
     try {
@@ -52,8 +73,8 @@ const AdminSpecialOffers = () => {
             discountType: 'percentage',
             discountValue: 15,
             promoCode: 'WEEKEND15',
-            validFrom: '2024-04-01',
-            validUntil: '2024-12-31',
+            validFrom: '2026-04-01',
+            validUntil: '2026-12-31',
             category: 'Weekend Deal',
             status: 'active',
             minOrderAmount: 100,
@@ -61,25 +82,29 @@ const AdminSpecialOffers = () => {
             usageLimit: 1000,
             usedCount: 45,
             image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800',
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            applicationType: 'order',
+            targetProducts: []
           },
           {
             id: 2,
-            title: 'First Order Discount',
-            description: 'New customers get 20% off their first order',
+            title: 'Pizza Discount',
+            description: 'Get 20% off on selected pizzas only',
             discountType: 'percentage',
             discountValue: 20,
-            promoCode: 'FIRST20',
-            validFrom: '2024-04-01',
-            validUntil: '2024-12-31',
-            category: 'New Customer',
+            promoCode: 'PIZZA20',
+            validFrom: '2026-04-01',
+            validUntil: '2026-12-31',
+            category: 'Product Special',
             status: 'active',
-            minOrderAmount: 50,
+            minOrderAmount: 0,
             maxDiscount: 150,
             usageLimit: 500,
             usedCount: 23,
             image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800',
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            applicationType: 'product',
+            targetProducts: [1, 2] // Margherita and Pepperoni Pizza
           }
         ];
         localStorage.setItem('specialOffers', JSON.stringify(defaultOffers));
@@ -152,7 +177,9 @@ const AdminSpecialOffers = () => {
       minOrderAmount: '',
       maxDiscount: '',
       usageLimit: '',
-      image: ''
+      image: '',
+      applicationType: 'order',
+      targetProducts: []
     });
     setImageFile(null);
     setImagePreview('');
@@ -164,6 +191,11 @@ const AdminSpecialOffers = () => {
     
     if (!newOffer.title || !newOffer.description || !newOffer.discountValue || !newOffer.promoCode) {
       toast.error('Please fill in all required fields');
+      return;
+    }
+    
+    if (newOffer.applicationType === 'product' && newOffer.targetProducts.length === 0) {
+      toast.error('Please select at least one product for product-specific discount');
       return;
     }
     
@@ -189,7 +221,9 @@ const AdminSpecialOffers = () => {
       maxDiscount: parseFloat(newOffer.maxDiscount) || 0,
       usageLimit: parseInt(newOffer.usageLimit) || 0,
       usedCount: 0,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      applicationType: newOffer.applicationType,
+      targetProducts: newOffer.targetProducts
     };
     
     const updatedOffers = [...offers, offerToAdd];
@@ -227,7 +261,9 @@ const AdminSpecialOffers = () => {
       minOrderAmount: offer.minOrderAmount.toString(),
       maxDiscount: offer.maxDiscount.toString(),
       usageLimit: offer.usageLimit.toString(),
-      image: offer.image
+      image: offer.image,
+      applicationType: offer.applicationType || 'order',
+      targetProducts: offer.targetProducts || []
     });
     setImageFile(null);
     setImagePreview(offer.image || '');
@@ -239,6 +275,11 @@ const AdminSpecialOffers = () => {
     
     if (!newOffer.title || !newOffer.description || !newOffer.discountValue || !newOffer.promoCode) {
       toast.error('Please fill in all required fields');
+      return;
+    }
+    
+    if (newOffer.applicationType === 'product' && newOffer.targetProducts.length === 0) {
+      toast.error('Please select at least one product for product-specific discount');
       return;
     }
     
@@ -265,7 +306,9 @@ const AdminSpecialOffers = () => {
             minOrderAmount: parseFloat(newOffer.minOrderAmount) || 0,
             maxDiscount: parseFloat(newOffer.maxDiscount) || 0,
             usageLimit: parseInt(newOffer.usageLimit) || 0,
-            updatedAt: new Date().toISOString()
+            updatedAt: new Date().toISOString(),
+            applicationType: newOffer.applicationType,
+            targetProducts: newOffer.targetProducts
           }
         : o
     );
@@ -463,6 +506,11 @@ const AdminSpecialOffers = () => {
                           </div>
                           <div className="text-sm text-gray-500 dark:text-gray-400">
                             {offer.category}
+                            {offer.applicationType === 'product' && (
+                              <span className="ml-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 px-2 py-1 rounded">
+                                Product-specific
+                              </span>
+                            )}
                           </div>
                         </div>
                       </div>

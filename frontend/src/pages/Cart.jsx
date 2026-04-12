@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { ShoppingCart, Trash2, Plus, Minus, ArrowRight } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import Modal from '../components/common/Modal';
@@ -10,6 +10,16 @@ const Cart = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [itemToRemove, setItemToRemove] = useState(null);
   const [showClearModal, setShowClearModal] = useState(false);
+  const [searchParams] = useSearchParams();
+  const [detectedPromo, setDetectedPromo] = useState('');
+
+  // Detect promo code from URL
+  useEffect(() => {
+    const urlPromoCode = searchParams.get('promo');
+    if (urlPromoCode) {
+      setDetectedPromo(urlPromoCode);
+    }
+  }, [searchParams]);
 
   const handleQuantityChange = (itemId, newQuantity) => {
     if (newQuantity < 1) {
@@ -65,6 +75,34 @@ const Cart = () => {
             <ShoppingCart className="w-24 h-24 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Your cart is empty</h2>
             <p className="text-gray-600 dark:text-gray-400 mb-6">Add some delicious items to get started!</p>
+            
+            {/* Debug info */}
+            <div className="bg-yellow-100 dark:bg-yellow-900/20 border border-yellow-400 rounded-lg p-4 mb-6 text-left max-w-md mx-auto">
+              <h3 className="font-bold text-yellow-800 dark:text-yellow-400 mb-2">🐛 Debug Info:</h3>
+              <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                Cart Items: {cartItems.length}<br/>
+                Item Count: {itemCount}<br/>
+                Total: ${total?.toFixed(2) || '0.00'}
+              </p>
+            </div>
+            
+            {/* Always visible checkout button for testing */}
+            <div className="mb-6">
+              <Link
+                to="/checkout"
+                className="inline-flex items-center px-8 py-4 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-colors text-lg shadow-lg mr-4"
+              >
+                🚀 Test Checkout Button (Always Visible)
+              </Link>
+              
+              <button
+                onClick={() => window.location.href = '/checkout'}
+                className="inline-flex items-center px-8 py-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors text-lg shadow-lg"
+              >
+                🔵 Alternative Checkout
+              </button>
+            </div>
+            
             <Link
               to="/products"
               className="inline-flex items-center px-6 py-3 bg-primary-600 dark:bg-accent-500 text-white font-medium rounded-lg hover:bg-primary-700 dark:hover:bg-accent-600 transition-colors"
@@ -137,6 +175,20 @@ const Cart = () => {
             <div className="bg-white dark:bg-dark-800 rounded-lg shadow-md p-6">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Order Summary</h2>
               
+              {detectedPromo && (
+                <div className="mb-4 bg-gradient-to-r from-green-500 to-green-600 border border-green-400 rounded-lg p-4 text-white">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-lg">🎉</span>
+                    <div>
+                      <p className="font-semibold">Promo Code Ready: {detectedPromo}</p>
+                      <p className="text-green-100 text-sm">
+                        This discount will be automatically applied at checkout
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between">
                   <span className="text-gray-600 dark:text-gray-400">Subtotal</span>
@@ -153,11 +205,13 @@ const Cart = () => {
               </div>
 
               <Link
-                to="/checkout"
-                className="w-full bg-primary-600 dark:bg-accent-500 text-white py-3 rounded-lg font-medium hover:bg-primary-700 dark:hover:bg-accent-600 transition-colors flex items-center justify-center space-x-2"
+                to={detectedPromo ? `/checkout?promo=${detectedPromo}` : "/checkout"}
+                className="w-full bg-primary-600 dark:bg-accent-500 text-white py-4 px-6 rounded-lg font-semibold hover:bg-primary-700 dark:hover:bg-accent-600 transition-colors flex items-center justify-center space-x-2 text-lg shadow-lg"
               >
-                <span>Proceed to Checkout</span>
-                <ArrowRight size={20} />
+                <span>
+                  {detectedPromo ? `Checkout with ${detectedPromo} • $${calculateTotal().toFixed(2)}` : `Proceed to Checkout • $${calculateTotal().toFixed(2)}`}
+                </span>
+                <ArrowRight size={24} />
               </Link>
               
               <button 

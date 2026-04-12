@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CreditCard, MapPin, User, Phone, Mail, ArrowLeft, CheckCircle } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -8,11 +8,70 @@ import toast from 'react-hot-toast';
 
 const Checkout = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { cartItems, total, clearCart } = useCart();
   const { user } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [orderId, setOrderId] = useState('');
+  const [promoCode, setPromoCode] = useState('');
+  const [appliedOffer, setAppliedOffer] = useState(null);
+  const [promoError, setPromoError] = useState('');
+
+  // Auto-apply promo code from URL parameters
+  useEffect(() => {
+    const urlPromoCode = searchParams.get('promo');
+    if (urlPromoCode && !appliedOffer) {
+      setPromoCode(urlPromoCode.toUpperCase());
+      // Auto-apply the promo code
+      setTimeout(() => {
+        applyPromoCodeFromUrl(urlPromoCode);
+      }, 100);
+    }
+  }, [searchParams]);
+
+  const applyPromoCodeFromUrl = (code) => {
+    try {
+      const savedOffers = JSON.parse(localStorage.getItem('specialOffers') || '[]');
+      const offer = savedOffers.find(o => 
+        o.promoCode.toUpperCase() === code.toUpperCase() && 
+        o.status === 'active' && 
+        new Date(o.validUntil) >= new Date()
+      );
+
+      if (offer) {
+        // Check minimum order amount
+        if (offer.minOrderAmount > 0 && calculateSubtotal() < offer.minOrderAmount) {
+          setPromoError(`Minimum order amount is ETB ${offer.minOrderAmount}`);
+          return;
+        }
+
+        // Check if product-specific offer has eligible items in cart
+        if (offer.applicationType === 'product' && offer.targetProducts?.length > 0) {
+          const eligibleItems = cartItems.filter(item => 
+            offer.targetProducts.includes(item.id)
+          );
+          
+          if (eligibleItems.length === 0) {
+            setPromoError('No eligible products in cart for this promo code');
+            return;
+          }
+        }
+
+        setAppliedOffer(offer);
+        setPromoError('');
+        
+        const discountAmount = calculateDiscountForOffer(offer);
+        const message = offer.applicationType === 'product' 
+          ? `Promo code ${code} applied to eligible products automatically! You saved ETB ${discountAmount.toFixed(2)}`
+          : `Promo code ${code} applied automatically! You saved ETB ${discountAmount.toFixed(2)}`;
+        
+        toast.success(message);
+      }
+    } catch (error) {
+      console.error('Failed to apply promo code from URL:', error);
+    }
+  };
 
   const [formData, setFormData] = useState({
     // Delivery Information
@@ -54,7 +113,116 @@ const Checkout = () => {
   };
 
   const calculateTotal = () => {
-    return calculateSubtotal() + calculateTax() + calculateDeliveryFee();
+    let total = calculateSubtotal() + calculateTax() + calculateDeliveryFee();
+    
+    // Apply discount if promo code is valid
+    if (appliedOffer) {
+      const discount = calculateDiscount();
+      total -= discount;
+      total = Math.max(total, 0); // Ensure total doesn't go negative
+    }
+    
+    return total;
+  };
+
+  const calculateDiscount = () => {
+    if (!appliedOffer) return 0;
+    return calculateDiscountForOffer(appliedOffer);
+  };
+
+  const calculateDiscountForOffer = (offer) => {
+    if (!offer) return 0;
+    
+    let discountAmount = 0;
+    
+    // Check if it's a product-specific discount
+    if (offer.applicationType === 'product' && offer.targetProducts?.length > 0) {
+      // Calculate discount only for target products
+      const eligibleItems = cartItems.filter(item => 
+        offer.targetProducts.includes(item.id)
+      );
+      
+      const eligibleSubtotal = eligibleItems.reduce((sum, item) => 
+        sum + (Number(item.price) * item.quantity), 0
+      );
+      
+      if (offer.discountType === 'percentage') {
+        discountAmount = eligibleSubtotal * (offer.discountValue / 100);
+      } else if (offer.discountType === 'fixed') {
+        discountAmount = Math.min(offer.discountValue, eligibleSubtotal);
+      }
+    } else {
+      // Order-wide discount (original logic)
+      const subtotal = calculateSubtotal() + calculateTax() + calculateDeliveryFee();
+      
+      if (offer.discountType === 'percentage') {
+        discountAmount = subtotal * (offer.discountValue / 100);
+      } else if (offer.discountType === 'fixed') {
+        discountAmount = Math.min(offer.discountValue, subtotal);
+      }
+    }
+    
+    // Apply max discount limit if set
+    const maxDiscount = offer.maxDiscount || Infinity;
+    return Math.min(discountAmount, maxDiscount);
+  };
+
+  const applyPromoCode = () => {
+    if (!promoCode.trim()) {
+      setPromoError('Please enter a promo code');
+      return;
+    }
+
+    try {
+      const savedOffers = JSON.parse(localStorage.getItem('specialOffers') || '[]');
+      const offer = savedOffers.find(o => 
+        o.promoCode.toUpperCase() === promoCode.toUpperCase() && 
+        o.status === 'active' && 
+        new Date(o.validUntil) >= new Date()
+      );
+
+      if (!offer) {
+        setPromoError('Invalid or expired promo code');
+        return;
+      }
+
+      // Check minimum order amount
+      if (offer.minOrderAmount > 0 && calculateSubtotal() < offer.minOrderAmount) {
+        setPromoError(`Minimum order amount is ETB ${offer.minOrderAmount}`);
+        return;
+      }
+
+      // Check if product-specific offer has eligible items in cart
+      if (offer.applicationType === 'product' && offer.targetProducts?.length > 0) {
+        const eligibleItems = cartItems.filter(item => 
+          offer.targetProducts.includes(item.id)
+        );
+        
+        if (eligibleItems.length === 0) {
+          setPromoError('No eligible products in cart for this promo code');
+          return;
+        }
+      }
+
+      setAppliedOffer(offer);
+      setPromoError('');
+      
+      const discountAmount = calculateDiscountForOffer(offer);
+      const message = offer.applicationType === 'product' 
+        ? `Promo code applied to eligible products! You saved ETB ${discountAmount.toFixed(2)}`
+        : `Promo code applied! You saved ETB ${discountAmount.toFixed(2)}`;
+      
+      toast.success(message);
+    } catch (error) {
+      setPromoError('Failed to apply promo code');
+    }
+  };
+
+  const removePromoCode = () => {
+    setAppliedOffer(null);
+    setPromoCode('');
+    setPromoError('');
+    toast.success('Promo code removed');
   };
 
   const getPaymentMethodName = (method) => {
@@ -128,6 +296,8 @@ const Checkout = () => {
         subtotal: calculateSubtotal(),
         tax: calculateTax(),
         deliveryFee: calculateDeliveryFee(),
+        discount: calculateDiscount(),
+        appliedOffer: appliedOffer,
         total: calculateTotal(),
         deliveryInfo: {
           fullName: formData.fullName,
@@ -484,7 +654,7 @@ const Checkout = () => {
                     <ol className="text-sm text-green-800 dark:text-green-200 space-y-1">
                       <li>1. Open your {formData.paymentMethod === 'telebirr' ? 'TeleBirr' : 'E-Birr'} app</li>
                       <li>2. Send money to our merchant number</li>
-                      <li>3. Use the total amount: ${calculateTotal().toFixed(2)}</li>
+                      <li>3. Use the total amount: ETB {calculateTotal().toFixed(2)}</li>
                       <li>4. Enter your phone number above</li>
                       <li>5. Save the transaction ID for reference</li>
                     </ol>
@@ -497,7 +667,7 @@ const Checkout = () => {
                 <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-4">
                   <h4 className="font-medium text-orange-900 dark:text-orange-100 mb-2">Cash on Delivery:</h4>
                   <ul className="text-sm text-orange-800 dark:text-orange-200 space-y-1">
-                    <li>• Pay ${calculateTotal().toFixed(2)} when your order arrives</li>
+                    <li>• Pay ETB {calculateTotal().toFixed(2)} when your order arrives</li>
                     <li>• Have exact change ready for faster service</li>
                     <li>• Our delivery person will provide a receipt</li>
                     <li>• No advance payment required</li>
@@ -536,10 +706,80 @@ const Checkout = () => {
                       <p className="text-sm text-gray-600 dark:text-gray-400">Qty: {item.quantity}</p>
                     </div>
                     <p className="font-medium text-gray-900 dark:text-gray-100">
-                      ${(Number(item.price) * item.quantity).toFixed(2)}
+                      ETB {(Number(item.price) * item.quantity).toFixed(2)}
                     </p>
                   </div>
                 ))}
+              </div>
+              
+              {/* Promo Code Section */}
+              <div className="border-t border-gray-200 dark:border-dark-700 pt-4 mb-4">
+                <div className="space-y-3">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Promo Code
+                  </label>
+                  <div className="flex space-x-2">
+                    <input
+                      type="text"
+                      value={promoCode}
+                      onChange={(e) => {
+                        setPromoCode(e.target.value.toUpperCase());
+                        setPromoError('');
+                      }}
+                      placeholder="Enter promo code"
+                      className="flex-1 px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-dark-700 text-gray-900 dark:text-gray-100 text-sm"
+                      disabled={appliedOffer}
+                    />
+                    {appliedOffer ? (
+                      <button
+                        type="button"
+                        onClick={removePromoCode}
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
+                      >
+                        Remove
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={applyPromoCode}
+                        className="px-4 py-2 bg-primary-600 dark:bg-accent-500 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-accent-600 transition-colors text-sm"
+                      >
+                        Apply
+                      </button>
+                    )}
+                  </div>
+                  {promoError && (
+                    <p className="text-red-600 dark:text-red-400 text-sm">{promoError}</p>
+                  )}
+                  {appliedOffer && (
+                    <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-3">
+                      <p className="text-green-800 dark:text-green-400 text-sm font-medium">
+                        ✓ {appliedOffer.title} applied
+                      </p>
+                      <p className="text-green-600 dark:text-green-300 text-xs">
+                        {appliedOffer.description}
+                      </p>
+                      {appliedOffer.applicationType === 'product' && appliedOffer.targetProducts?.length > 0 && (
+                        <div className="mt-2">
+                          <p className="text-green-700 dark:text-green-300 text-xs font-medium">
+                            Eligible products in your cart:
+                          </p>
+                          <div className="mt-1 space-y-1">
+                            {cartItems
+                              .filter(item => appliedOffer.targetProducts.includes(item.id))
+                              .map(item => (
+                                <div key={item.id} className="flex justify-between text-xs text-green-600 dark:text-green-400">
+                                  <span>{item.name} (x{item.quantity})</span>
+                                  <span>ETB {(Number(item.price) * item.quantity).toFixed(2)}</span>
+                                </div>
+                              ))
+                            }
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
               
               <div className="border-t border-gray-200 dark:border-dark-700 pt-4 space-y-2">
@@ -549,21 +789,32 @@ const Checkout = () => {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600 dark:text-gray-400">Subtotal</span>
-                  <span className="text-gray-900 dark:text-gray-100">${calculateSubtotal().toFixed(2)}</span>
+                  <span className="text-gray-900 dark:text-gray-100">ETB {calculateSubtotal().toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600 dark:text-gray-400">Tax</span>
-                  <span className="text-gray-900 dark:text-gray-100">${calculateTax().toFixed(2)}</span>
+                  <span className="text-gray-900 dark:text-gray-100">ETB {calculateTax().toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600 dark:text-gray-400">Delivery Fee</span>
                   <span className="text-gray-900 dark:text-gray-100">
-                    {calculateDeliveryFee() === 0 ? 'FREE' : `$${calculateDeliveryFee().toFixed(2)}`}
+                    {calculateDeliveryFee() === 0 ? 'FREE' : `ETB ${calculateDeliveryFee().toFixed(2)}`}
                   </span>
                 </div>
+                {appliedOffer && (
+                  <div className="flex justify-between text-green-600 dark:text-green-400">
+                    <span>
+                      Discount ({appliedOffer.promoCode})
+                      {appliedOffer.applicationType === 'product' && (
+                        <span className="text-xs ml-1">(Product-specific)</span>
+                      )}
+                    </span>
+                    <span>-ETB {calculateDiscount().toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-lg font-bold border-t border-gray-200 dark:border-dark-700 pt-2">
                   <span className="text-gray-900 dark:text-gray-100">Total</span>
-                  <span className="text-gray-900 dark:text-gray-100">${calculateTotal().toFixed(2)}</span>
+                  <span className="text-gray-900 dark:text-gray-100">ETB {calculateTotal().toFixed(2)}</span>
                 </div>
               </div>
 
@@ -572,7 +823,7 @@ const Checkout = () => {
                 disabled={isProcessing}
                 className="w-full mt-6 bg-primary-600 dark:bg-accent-500 text-white py-3 rounded-lg font-medium hover:bg-primary-700 dark:hover:bg-accent-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isProcessing ? 'Processing...' : `Place Order - $${calculateTotal().toFixed(2)}`}
+                {isProcessing ? 'Processing...' : `Place Order - ETB ${calculateTotal().toFixed(2)}`}
               </button>
               
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 text-center">
@@ -608,7 +859,7 @@ const Checkout = () => {
             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
               <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-2">Next Steps:</h4>
               <ol className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
-                <li>1. Transfer ${calculateTotal().toFixed(2)} to our {getPaymentMethodName(formData.paymentMethod)} account</li>
+                <li>1. Transfer ETB {calculateTotal().toFixed(2)} to our {getPaymentMethodName(formData.paymentMethod)} account</li>
                 <li>2. Use order ID: {orderId} as reference</li>
                 <li>3. Keep your transaction receipt</li>
                 <li>4. Your order will be confirmed once payment is verified</li>
@@ -621,7 +872,7 @@ const Checkout = () => {
               <h4 className="font-medium text-green-900 dark:text-green-100 mb-2">Next Steps:</h4>
               <ol className="text-sm text-green-800 dark:text-green-200 space-y-1">
                 <li>1. Open your {getPaymentMethodName(formData.paymentMethod)} app</li>
-                <li>2. Send ${calculateTotal().toFixed(2)} to our merchant number</li>
+                <li>2. Send ETB {calculateTotal().toFixed(2)} to our merchant number</li>
                 <li>3. Use order ID: {orderId} as reference</li>
                 <li>4. Save the transaction ID</li>
                 <li>5. Your order will be confirmed once payment is received</li>
@@ -634,7 +885,7 @@ const Checkout = () => {
               <h4 className="font-medium text-orange-900 dark:text-orange-100 mb-2">Next Steps:</h4>
               <ul className="text-sm text-orange-800 dark:text-orange-200 space-y-1">
                 <li>• Your order is confirmed and being prepared</li>
-                <li>• Prepare ${calculateTotal().toFixed(2)} in cash</li>
+                <li>• Prepare ETB {calculateTotal().toFixed(2)} in cash</li>
                 <li>• Our delivery person will contact you</li>
                 <li>• Pay when your order arrives at your door</li>
                 <li>• You'll receive a receipt upon payment</li>

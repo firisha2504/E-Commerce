@@ -15,7 +15,6 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
 import { useLogo } from '../../contexts/LogoContext';
 import ThemeToggle from '../common/ThemeToggle';
-import NotificationCenter from '../common/NotificationCenter';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -159,9 +158,6 @@ const Navbar = () => {
 
             {/* Theme Toggle */}
             <ThemeToggle />
-
-            {/* Notifications */}
-            {isAuthenticated && <NotificationCenter />}
 
             {/* Cart */}
             <Link 

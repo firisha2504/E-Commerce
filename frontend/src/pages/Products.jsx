@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
-import { Search, Filter, CheckCircle } from 'lucide-react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { Search, Filter, CheckCircle, Tag, Gift } from 'lucide-react';
 import { productsAPI } from '../services/api';
 import ProductImage from '../components/common/ProductImage';
 import Modal from '../components/common/Modal';
@@ -12,7 +12,30 @@ const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
+  const [searchParams] = useSearchParams();
+  const [detectedOffer, setDetectedOffer] = useState(null);
   const { addToCart } = useCart();
+
+  // Detect promo code from URL
+  useEffect(() => {
+    const urlPromoCode = searchParams.get('promo');
+    if (urlPromoCode) {
+      try {
+        const savedOffers = JSON.parse(localStorage.getItem('specialOffers') || '[]');
+        const offer = savedOffers.find(o => 
+          o.promoCode.toUpperCase() === urlPromoCode.toUpperCase() && 
+          o.status === 'active' && 
+          new Date(o.validUntil) >= new Date()
+        );
+        
+        if (offer) {
+          setDetectedOffer(offer);
+        }
+      } catch (error) {
+        console.error('Failed to detect promo code:', error);
+      }
+    }
+  }, [searchParams]);
 
   const { data: products, isLoading: productsLoading } = useQuery({
     queryKey: ['products', { search: searchTerm, category: selectedCategory }],
@@ -35,7 +58,11 @@ const Products = () => {
 
   const handleAddToCart = (product) => {
     addToCart(product, 1);
-    setModalMessage(`${product.name} added to cart!`);
+    if (detectedOffer) {
+      setModalMessage(`${product.name} added to cart! 🎉 Your ${detectedOffer.promoCode} discount will be applied at checkout.`);
+    } else {
+      setModalMessage(`${product.name} added to cart!`);
+    }
     setShowModal(true);
   };
 
@@ -57,6 +84,41 @@ const Products = () => {
             Discover authentic Ethiopian cuisine made with love and tradition
           </p>
         </div>
+
+        {/* Promo Code Banner */}
+        {detectedOffer && (
+          <div className="mb-8 bg-gradient-to-r from-green-500 to-green-600 dark:from-green-600 dark:to-green-700 rounded-lg shadow-lg p-6 text-white">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="bg-white/20 rounded-full p-3">
+                  <Gift size={24} />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold">{detectedOffer.title}</h3>
+                  <p className="text-green-100">{detectedOffer.description}</p>
+                  <p className="text-sm text-green-200 mt-1">
+                    Code: <span className="font-mono bg-white/20 px-2 py-1 rounded">{detectedOffer.promoCode}</span>
+                    {detectedOffer.minOrderAmount > 0 && ` • Min order: $${detectedOffer.minOrderAmount}`}
+                  </p>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-2xl font-bold">
+                  {detectedOffer.discountType === 'percentage' 
+                    ? `${detectedOffer.discountValue}% OFF`
+                    : `$${detectedOffer.discountValue} OFF`
+                  }
+                </div>
+                <p className="text-sm text-green-200 mt-1">
+                  Add items to cart below ⬇️
+                </p>
+                <p className="text-xs text-green-300 mt-1">
+                  Discount applies automatically at checkout
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Search and Filter */}
         <div className="mb-8 flex flex-col md:flex-row gap-4">
