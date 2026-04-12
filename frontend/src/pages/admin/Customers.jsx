@@ -240,7 +240,6 @@ const AdminCustomers = () => {
 
   const handleSendMessage = () => {
     // In a real app, this would send the message via API
-    console.log('Sending message to', selectedCustomer.email, ':', messageText);
     setShowMessageModal(false);
     setMessageText('');
     toast.success('Message sent successfully');

@@ -341,7 +341,6 @@ const ProductDetail = () => {
                       onClick={() => {
                         // Simulate adding related dish to cart
                         // In a real app, you would have the actual product data
-                        console.log(`Related Dish ${item} would be added to cart`);
                       }}
                       className="absolute bottom-4 right-4 bg-white dark:bg-dark-800 text-primary-600 dark:text-accent-400 p-3 rounded-full shadow-lg transform translate-y-12 group-hover:translate-y-0 transition-all duration-500 hover:bg-primary-50 dark:hover:bg-accent-900/20"
                     >

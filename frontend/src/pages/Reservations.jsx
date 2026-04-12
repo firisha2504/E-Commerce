@@ -24,7 +24,6 @@ const Reservations = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // In a real app, you would send this data to your backend
-    console.log('Reservation submitted:', formData);
     setShowSuccessModal(true);
     
     // Reset form

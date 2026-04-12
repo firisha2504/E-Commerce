@@ -59,8 +59,6 @@ const AdminSettings = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // In a real app, you would call the API to update settings
-    console.log('Update settings:', settings);
-    console.log('Logo:', logo);
     
     // Update the logo globally if a new one was uploaded
     if (logoPreview) {

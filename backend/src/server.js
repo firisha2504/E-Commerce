@@ -10,9 +10,6 @@ const { testConnection } = require('./config/database');
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
 const orderRoutes = require('./routes/orders');
-const cartRoutes = require('./routes/cart');
-const paymentRoutes = require('./routes/payments');
-const feedbackRoutes = require('./routes/feedback');
 const adminRoutes = require('./routes/admin');
 const analyticsRoutes = require('./routes/analytics');
 
@@ -61,9 +58,6 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
-app.use('/api/cart', cartRoutes);
-app.use('/api/payments', paymentRoutes);
-app.use('/api/feedback', feedbackRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/analytics', analyticsRoutes);
 

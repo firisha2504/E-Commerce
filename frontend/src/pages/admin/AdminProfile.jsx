@@ -159,7 +159,6 @@ const AdminProfile = () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // In a real app, you would call the API to change password
-      console.log('Change password:', passwordData);
       
       setPasswordData({
         currentPassword: '',

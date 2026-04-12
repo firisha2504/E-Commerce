@@ -14,7 +14,6 @@ const Contact = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // In a real app, you would send this data to your backend
-    console.log('Form submitted:', formData);
     setShowSuccessModal(true);
     setFormData({ name: '', email: '', subject: '', message: '' });
   };

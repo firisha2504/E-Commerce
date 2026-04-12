@@ -124,25 +124,6 @@ const SpecialOffers = () => {
 
         {/* Offers Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {/* Debug info */}
-          <div className="col-span-full bg-yellow-100 dark:bg-yellow-900/20 border border-yellow-400 rounded-lg p-4 mb-4">
-            <h3 className="font-bold text-yellow-800 dark:text-yellow-400 mb-2">🐛 Debug Info:</h3>
-            <p className="text-sm text-yellow-700 dark:text-yellow-300">
-              Total offers in localStorage: {JSON.parse(localStorage.getItem('specialOffers') || '[]').length}<br/>
-              Active offers displayed: {offers.length}<br/>
-              Current date: {new Date().toISOString().split('T')[0]}
-            </p>
-            <button
-              onClick={() => {
-                localStorage.removeItem('specialOffers');
-                window.location.reload();
-              }}
-              className="mt-2 bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-yellow-700"
-            >
-              🔄 Reset Offers & Reload
-            </button>
-          </div>
-          
           {offers.map((offer) => (
             <div
               key={offer.id}

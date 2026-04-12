@@ -144,7 +144,6 @@ router.post('/login', async (req, res) => {
 // Get current user profile
 router.get('/profile', authenticateToken, async (req, res) => {
   try {
-    console.log('Profile request for user:', req.user); // Debug log
     
     const user = await queryOne(
       `SELECT user_id as id, name, email, phone, address, is_admin as isAdmin, created_at as createdAt 

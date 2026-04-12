@@ -58,7 +58,6 @@ const Profile = () => {
         formData.append('profileImage', file);
         
         const response = await authAPI.uploadProfileImage(formData);
-        console.log('Image uploaded:', response.data);
         setShowSuccessModal(true);
       } catch (error) {
         console.error('Failed to upload image:', error);
@@ -80,8 +79,6 @@ const Profile = () => {
       formDataToSend.append('profileImage', profileImage);
     }
     
-    console.log('Update profile:', formData);
-    console.log('Profile image:', profileImage);
     setIsEditing(false);
     setShowSuccessModal(true);
   };
