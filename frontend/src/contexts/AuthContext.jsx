@@ -14,6 +14,7 @@ const authReducer = (state, action) => {
       return { ...state, isLoading: true };
     case 'LOGIN_SUCCESS':
       localStorage.setItem('token', action.payload.token);
+      localStorage.setItem('user', JSON.stringify(action.payload.user)); // Store user data
       return {
         ...state,
         user: action.payload.user,
@@ -23,6 +24,7 @@ const authReducer = (state, action) => {
       };
     case 'LOGIN_FAILURE':
       localStorage.removeItem('token');
+      localStorage.removeItem('user'); // Remove user data on login failure
       return {
         ...state,
         user: null,
@@ -32,6 +34,7 @@ const authReducer = (state, action) => {
       };
     case 'LOGOUT':
       localStorage.removeItem('token');
+      localStorage.removeItem('user'); // Remove user data on logout
       return {
         ...state,
         user: null,

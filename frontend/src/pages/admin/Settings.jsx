@@ -15,7 +15,7 @@ const AdminSettings = () => {
     restaurantName: 'FA Restaurant',
     email: 'info@farestaurant.com',
     phone: '+251 911 234 567',
-    address: '123 Restaurant Street, Addis Ababa',
+    address: '123 Restaurant Street, Dire Dawa',
     deliveryFee: '50',
     taxRate: '15',
     currency: 'ETB',

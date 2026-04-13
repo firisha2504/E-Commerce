@@ -100,7 +100,7 @@ const AdminCustomers = () => {
         name: 'Demo Customer 1',
         email: 'demo1@example.com',
         phone: '+251911111111',
-        address: '123 Demo St, Addis Ababa',
+        address: '123 Demo St, Dire Dawa',
         joinDate: '2024-01-15',
         totalOrders: 5,
         totalSpent: 2500,
