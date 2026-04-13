@@ -234,7 +234,7 @@ const Reservations = () => {
                 <div>
                   <p className="font-medium text-gray-900 dark:text-gray-100 mb-1">Location</p>
                   <p className="text-gray-600 dark:text-gray-400">123 Restaurant Street</p>
-                  <p className="text-gray-600 dark:text-gray-400">Addis Ababa, Ethiopia</p>
+                  <p className="text-gray-600 dark:text-gray-400">Dire Dawa, Ethiopia</p>
                 </div>
                 <div>
                   <p className="font-medium text-gray-900 dark:text-gray-100 mb-1">Contact</p>

@@ -167,7 +167,7 @@ async function seedDatabase() {
     
     await query(`
       INSERT IGNORE INTO users (user_id, name, email, phone, password_hash, address, is_admin) 
-      VALUES (?, 'FA Restaurant Admin', 'admin@farestaurant.com', '+251911000000', ?, 'FA Restaurant Headquarters, Addis Ababa', true)
+      VALUES (?, 'FA Restaurant Admin', 'admin@farestaurant.com', '+251911000000', ?, 'FA Restaurant Headquarters, Dire Dawa', true)
     `, [adminId, adminPassword]);
 
     // Create sample customer
@@ -176,7 +176,7 @@ async function seedDatabase() {
     
     await query(`
       INSERT IGNORE INTO users (user_id, name, email, phone, password_hash, address, is_admin) 
-      VALUES (?, 'Sample Customer', 'customer@example.com', '+251911111111', ?, '123 Sample Street, Addis Ababa, Ethiopia', false)
+      VALUES (?, 'Sample Customer', 'customer@example.com', '+251911111111', ?, '123 Sample Street, Dire Dawa, Ethiopia', false)
     `, [customerId, customerPassword]);
 
     console.log('✅ Users created');

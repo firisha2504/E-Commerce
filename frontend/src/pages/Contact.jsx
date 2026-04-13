@@ -52,7 +52,7 @@ const Contact = () => {
                   <div>
                     <h3 className="font-semibold text-gray-900 dark:text-gray-100">Our Location</h3>
                     <p className="text-gray-600 dark:text-gray-400">123 Restaurant Street</p>
-                    <p className="text-gray-600 dark:text-gray-400">Addis Ababa, Ethiopia</p>
+                    <p className="text-gray-600 dark:text-gray-400">Dire Dawa, Ethiopia</p>
                   </div>
                 </div>
 
@@ -188,7 +188,7 @@ const Contact = () => {
             <div className="text-center">
               <MapPin className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-2" />
               <p className="text-gray-600 dark:text-gray-400">Map would be displayed here</p>
-              <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">123 Restaurant Street, Addis Ababa</p>
+              <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">123 Restaurant Street, Dire Dawa</p>
             </div>
           </div>
         </div>

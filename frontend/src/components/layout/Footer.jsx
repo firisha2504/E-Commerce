@@ -45,7 +45,7 @@ const Footer = () => {
               </div>
               <div className="flex items-center space-x-2">
                 <MapPin size={16} className="text-primary-500 dark:text-accent-400" />
-                <span className="text-gray-300">Addis Ababa, Ethiopia</span>
+                <span className="text-gray-300">Dire Dawa, Ethiopia</span>
               </div>
             </div>
           </div>
@@ -94,7 +94,7 @@ const Footer = () => {
             <div className="mt-6">
               <h4 className="font-semibold mb-2">Delivery Areas</h4>
               <p className="text-gray-300 text-sm">
-                We deliver to all areas within Addis Ababa. 
+                We deliver to all areas within Dire Dawa. 
                 Delivery time: 30-45 minutes.
               </p>
             </div>
