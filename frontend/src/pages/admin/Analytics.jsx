@@ -162,17 +162,17 @@ const AdminAnalytics = () => {
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Sales Trend</h3>
           </div>
-          <div className="h-64 flex items-end justify-between space-x-2">
+          <div className="h-48 flex items-end justify-between space-x-2">
             {salesData.map((day, index) => {
               const maxSales = Math.max(...salesData.map(d => d.sales));
-              const height = (day.sales / maxSales) * 100;
+              const height = Math.max((day.sales / maxSales) * 140, 4);
               
               return (
                 <div key={day.date} className="flex flex-col items-center flex-1">
-                  <div className="w-full bg-gray-200 dark:bg-dark-700 rounded-t-lg relative">
+                  <div className="flex flex-col justify-end" style={{ height: '140px' }}>
                     <div
-                      className="bg-gradient-to-t from-primary-500 to-primary-400 rounded-t-lg transition-all duration-300 hover:from-primary-600 hover:to-primary-500"
-                      style={{ height: `${height}%` }}
+                      className="w-full bg-gradient-to-t from-primary-500 to-primary-400 rounded-t-lg transition-all duration-300 hover:from-primary-600 hover:to-primary-500"
+                      style={{ height: `${height}px` }}
                     />
                   </div>
                   <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">

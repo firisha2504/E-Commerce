@@ -56,8 +56,8 @@ const AdminDashboard = () => {
   const recentOrders = [
     { id: '127001', customer: 'Admin', product: 'Doro Wat', description: 'Ethiopian exemption...', status: 'Paid - In Preparation', total: 'ETB 580' },
     { id: '127002', customer: 'Shiro Tagamino', product: 'Doro Wat', description: 'Ethiopian ammame...', status: 'Shipped', total: 'ETB 580' },
-    { id: '127003', customer: 'Doro Wat', product: 'Tuna Pizza', description: 'Passion exotion for...', status: 'Delivered', total: 'ETB ETB' },
-    { id: '127004', customer: 'Doro Wat', product: 'Tuna Pizza', description: 'Tuna Pizza ommame...', status: 'Shipped', total: 'ETB ETB' },
+    { id: '127003', customer: 'Doro Wat', product: 'Tuna Pizza', description: 'Passion exotion for...', status: 'Delivered', total: 'ETB 450' },
+    { id: '127004', customer: 'Doro Wat', product: 'Tuna Pizza', description: 'Tuna Pizza ommame...', status: 'Shipped', total: 'ETB 320' },
     { id: '127005', customer: 'Shiro Tagamino', product: 'Passion Fruit Juice', description: 'Passion Fruit Juice f...', status: 'Delivered', total: 'ETB 15,520' }
   ];
 
@@ -137,67 +137,64 @@ const AdminDashboard = () => {
             </div>
             
             {/* Sales Trend Chart - Enhanced & Guaranteed Visible */}
-            <div className="h-64 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-dark-700 dark:to-dark-800 rounded-lg p-6 border border-gray-200 dark:border-dark-600">
-              {/* Chart Title */}
-              <div className="mb-4">
+            <div className="h-44 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-dark-700 dark:to-dark-800 rounded-lg p-4 border border-gray-200 dark:border-dark-600">
+              <div className="mb-2">
                 <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Weekly Performance</h4>
                 <p className="text-xs text-gray-500 dark:text-gray-400">Revenue (Green) vs Orders (Orange)</p>
               </div>
-              
-              {/* Interactive Grid Chart */}
-              <div className="grid grid-cols-7 gap-3 h-40 items-end">
+              <div className="grid grid-cols-7 gap-3 h-24 items-end">
                 {/* Monday */}
                 <div className="flex flex-col items-center space-y-1 group cursor-pointer">
-                  <div className="w-full bg-green-500 hover:bg-green-600 rounded-t transition-all duration-300 group-hover:shadow-lg" style={{ height: '60px' }} title="Revenue: ETB 12,500"></div>
-                  <div className="w-full bg-orange-400 hover:bg-orange-500 rounded-t transition-all duration-300 group-hover:shadow-lg" style={{ height: '45px' }} title="Orders: 45"></div>
+                  <div className="w-full bg-green-500 hover:bg-green-600 rounded-t transition-all duration-300 group-hover:shadow-lg" style={{ height: '36px' }} title="Revenue: ETB 12,500"></div>
+                  <div className="w-full bg-orange-400 hover:bg-orange-500 rounded-t transition-all duration-300 group-hover:shadow-lg" style={{ height: '27px' }} title="Orders: 45"></div>
                   <span className="text-xs text-gray-600 dark:text-gray-400 mt-2 font-medium">Mon</span>
                   <span className="text-xs text-gray-500 dark:text-gray-500">12.5k</span>
                 </div>
                 
                 {/* Tuesday */}
                 <div className="flex flex-col items-center space-y-1 group cursor-pointer">
-                  <div className="w-full bg-green-500 hover:bg-green-600 rounded-t transition-all duration-300 group-hover:shadow-lg" style={{ height: '80px' }} title="Revenue: ETB 18,200"></div>
-                  <div className="w-full bg-orange-400 hover:bg-orange-500 rounded-t transition-all duration-300 group-hover:shadow-lg" style={{ height: '65px' }} title="Orders: 62"></div>
+                  <div className="w-full bg-green-500 hover:bg-green-600 rounded-t transition-all duration-300 group-hover:shadow-lg" style={{ height: '48px' }} title="Revenue: ETB 18,200"></div>
+                  <div className="w-full bg-orange-400 hover:bg-orange-500 rounded-t transition-all duration-300 group-hover:shadow-lg" style={{ height: '39px' }} title="Orders: 62"></div>
                   <span className="text-xs text-gray-600 dark:text-gray-400 mt-2 font-medium">Tue</span>
                   <span className="text-xs text-gray-500 dark:text-gray-500">18.2k</span>
                 </div>
                 
                 {/* Wednesday */}
                 <div className="flex flex-col items-center space-y-1 group cursor-pointer">
-                  <div className="w-full bg-green-500 hover:bg-green-600 rounded-t transition-all duration-300 group-hover:shadow-lg" style={{ height: '70px' }} title="Revenue: ETB 15,800"></div>
-                  <div className="w-full bg-orange-400 hover:bg-orange-500 rounded-t transition-all duration-300 group-hover:shadow-lg" style={{ height: '55px' }} title="Orders: 54"></div>
+                  <div className="w-full bg-green-500 hover:bg-green-600 rounded-t transition-all duration-300 group-hover:shadow-lg" style={{ height: '42px' }} title="Revenue: ETB 15,800"></div>
+                  <div className="w-full bg-orange-400 hover:bg-orange-500 rounded-t transition-all duration-300 group-hover:shadow-lg" style={{ height: '33px' }} title="Orders: 54"></div>
                   <span className="text-xs text-gray-600 dark:text-gray-400 mt-2 font-medium">Wed</span>
                   <span className="text-xs text-gray-500 dark:text-gray-500">15.8k</span>
                 </div>
                 
                 {/* Thursday */}
                 <div className="flex flex-col items-center space-y-1 group cursor-pointer">
-                  <div className="w-full bg-green-500 hover:bg-green-600 rounded-t transition-all duration-300 group-hover:shadow-lg" style={{ height: '90px' }} title="Revenue: ETB 22,100"></div>
-                  <div className="w-full bg-orange-400 hover:bg-orange-500 rounded-t transition-all duration-300 group-hover:shadow-lg" style={{ height: '75px' }} title="Orders: 78"></div>
+                  <div className="w-full bg-green-500 hover:bg-green-600 rounded-t transition-all duration-300 group-hover:shadow-lg" style={{ height: '54px' }} title="Revenue: ETB 22,100"></div>
+                  <div className="w-full bg-orange-400 hover:bg-orange-500 rounded-t transition-all duration-300 group-hover:shadow-lg" style={{ height: '45px' }} title="Orders: 78"></div>
                   <span className="text-xs text-gray-600 dark:text-gray-400 mt-2 font-medium">Thu</span>
                   <span className="text-xs text-gray-500 dark:text-gray-500">22.1k</span>
                 </div>
                 
                 {/* Friday */}
                 <div className="flex flex-col items-center space-y-1 group cursor-pointer">
-                  <div className="w-full bg-green-500 hover:bg-green-600 rounded-t transition-all duration-300 group-hover:shadow-lg" style={{ height: '85px' }} title="Revenue: ETB 19,500"></div>
-                  <div className="w-full bg-orange-400 hover:bg-orange-500 rounded-t transition-all duration-300 group-hover:shadow-lg" style={{ height: '70px' }} title="Orders: 68"></div>
+                  <div className="w-full bg-green-500 hover:bg-green-600 rounded-t transition-all duration-300 group-hover:shadow-lg" style={{ height: '51px' }} title="Revenue: ETB 19,500"></div>
+                  <div className="w-full bg-orange-400 hover:bg-orange-500 rounded-t transition-all duration-300 group-hover:shadow-lg" style={{ height: '42px' }} title="Orders: 68"></div>
                   <span className="text-xs text-gray-600 dark:text-gray-400 mt-2 font-medium">Fri</span>
                   <span className="text-xs text-gray-500 dark:text-gray-500">19.5k</span>
                 </div>
                 
                 {/* Saturday - Highest */}
                 <div className="flex flex-col items-center space-y-1 group cursor-pointer">
-                  <div className="w-full bg-green-500 hover:bg-green-600 rounded-t transition-all duration-300 group-hover:shadow-lg shadow-green-200 dark:shadow-green-800" style={{ height: '100px' }} title="Revenue: ETB 25,300"></div>
-                  <div className="w-full bg-orange-400 hover:bg-orange-500 rounded-t transition-all duration-300 group-hover:shadow-lg shadow-orange-200 dark:shadow-orange-800" style={{ height: '85px' }} title="Orders: 89"></div>
+                  <div className="w-full bg-green-500 hover:bg-green-600 rounded-t transition-all duration-300 group-hover:shadow-lg shadow-green-200 dark:shadow-green-800" style={{ height: '60px' }} title="Revenue: ETB 25,300"></div>
+                  <div className="w-full bg-orange-400 hover:bg-orange-500 rounded-t transition-all duration-300 group-hover:shadow-lg shadow-orange-200 dark:shadow-orange-800" style={{ height: '51px' }} title="Orders: 89"></div>
                   <span className="text-xs text-gray-600 dark:text-gray-400 mt-2 font-medium">Sat</span>
                   <span className="text-xs text-green-600 dark:text-green-400 font-semibold">25.3k</span>
                 </div>
                 
                 {/* Sunday */}
                 <div className="flex flex-col items-center space-y-1 group cursor-pointer">
-                  <div className="w-full bg-green-500 hover:bg-green-600 rounded-t transition-all duration-300 group-hover:shadow-lg" style={{ height: '95px' }} title="Revenue: ETB 21,400"></div>
-                  <div className="w-full bg-orange-400 hover:bg-orange-500 rounded-t transition-all duration-300 group-hover:shadow-lg" style={{ height: '80px' }} title="Orders: 74"></div>
+                  <div className="w-full bg-green-500 hover:bg-green-600 rounded-t transition-all duration-300 group-hover:shadow-lg" style={{ height: '57px' }} title="Revenue: ETB 21,400"></div>
+                  <div className="w-full bg-orange-400 hover:bg-orange-500 rounded-t transition-all duration-300 group-hover:shadow-lg" style={{ height: '48px' }} title="Orders: 74"></div>
                   <span className="text-xs text-gray-600 dark:text-gray-400 mt-2 font-medium">Sun</span>
                   <span className="text-xs text-gray-500 dark:text-gray-500">21.4k</span>
                 </div>

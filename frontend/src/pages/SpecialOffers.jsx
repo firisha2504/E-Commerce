@@ -169,7 +169,7 @@ const SpecialOffers = () => {
                 <div className="space-y-2 mb-4">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-600 dark:text-gray-400">Promo Code:</span>
-                    <code className="bg-gray-100 dark:bg-dark-700 px-2 py-1 rounded font-mono text-xs">
+                    <code className="bg-gray-100 dark:bg-dark-700 text-gray-800 dark:text-gray-200 px-2 py-1 rounded font-mono text-xs">
                       {offer.promoCode}
                     </code>
                   </div>

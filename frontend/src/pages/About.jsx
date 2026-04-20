@@ -148,8 +148,8 @@ const About = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Hero Section */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">About FA Restaurant</h1>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">About FA Restaurant</h1>
+          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
             Experience the authentic taste of Ethiopia with our traditional recipes passed down through generations.
           </p>
         </div>
@@ -158,16 +158,16 @@ const About = () => {
         <div className="mb-16">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Story</h2>
-              <p className="text-gray-600 mb-4">
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">Our Story</h2>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
                 Founded in 2023, FA Restaurant was born from a passion for sharing the rich culinary heritage of Ethiopia with the world. 
                 Our founder, Firomsa , grew up learning traditional recipes from his grandmother in Dire Dawa.
               </p>
-              <p className="text-gray-600 mb-4">
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
                 What started as a small family kitchen has grown into a beloved restaurant that brings people together through food, 
                 culture, and community.
               </p>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-400">
                 Every dish we serve tells a story - from the aromatic spices to the traditional cooking methods that have been 
                 perfected over centuries.
               </p>
@@ -189,7 +189,7 @@ const About = () => {
 
         {/* Values Section */}
         <div className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">Our Values</h2>
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 text-center mb-12">Our Values</h2>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-white dark:bg-dark-800 rounded-xl p-6 shadow-lg text-center">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 dark:bg-accent-900/30 rounded-full mb-4">

@@ -160,7 +160,7 @@ const Products = () => {
               key={product.id} 
               className="product-card group bg-white dark:bg-dark-800 rounded-2xl shadow-lg hover:shadow-2xl hover-lift transition-all duration-500 overflow-hidden border border-gray-100 dark:border-dark-600 hover:border-primary-200 dark:hover:border-accent-400/30 hover-glow"
             >
-              <div className="relative overflow-hidden h-56">
+              <div className="relative overflow-hidden h-44">
                 <ProductImage
                   src={product.imageUrl}
                   alt={product.name}
@@ -173,7 +173,7 @@ const Products = () => {
                 
                 {/* Price Badge */}
                 <div className="absolute top-4 right-4 bg-primary-600 dark:bg-accent-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg transform translate-x-12 group-hover:translate-x-0 transition-transform duration-500">
-                  ${product.price}
+                  ETB {product.price}
                 </div>
                 
                 {/* Favorite Button */}

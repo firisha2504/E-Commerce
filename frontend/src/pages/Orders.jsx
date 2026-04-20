@@ -1,19 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Package, Clock, CheckCircle, XCircle, Truck, ChevronRight } from 'lucide-react';
+import { Package, Clock, CheckCircle, XCircle, Truck, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import Modal from '../components/common/Modal';
+import toast from 'react-hot-toast';
 
 const Orders = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [orderToCancel, setOrderToCancel] = useState(null);
   const { user } = useAuth();
 
   useEffect(() => {
     const loadOrders = () => {
       try {
         const allOrders = JSON.parse(localStorage.getItem('orders') || '[]');
-        // Filter orders for current user
         const userOrders = allOrders.filter(order => order.userId === user?.id);
         setOrders(userOrders);
       } catch (error) {
@@ -23,13 +26,34 @@ const Orders = () => {
         setIsLoading(false);
       }
     };
-
-    if (user) {
-      loadOrders();
-    } else {
-      setIsLoading(false);
-    }
+    if (user) loadOrders();
+    else setIsLoading(false);
   }, [user]);
+
+  // Only pending or confirmed orders can be cancelled
+  const canCancel = (status) => status === 'pending' || status === 'confirmed';
+
+  const handleCancelClick = (order) => {
+    setOrderToCancel(order);
+    setShowCancelModal(true);
+  };
+
+  const confirmCancel = () => {
+    if (!orderToCancel) return;
+    try {
+      const allOrders = JSON.parse(localStorage.getItem('orders') || '[]');
+      const updated = allOrders.map(o =>
+        o.orderId === orderToCancel.orderId ? { ...o, status: 'cancelled' } : o
+      );
+      localStorage.setItem('orders', JSON.stringify(updated));
+      setOrders(updated.filter(o => o.userId === user?.id));
+      toast.success('Order cancelled successfully');
+    } catch {
+      toast.error('Failed to cancel order');
+    }
+    setShowCancelModal(false);
+    setOrderToCancel(null);
+  };
 
   const filteredOrders = statusFilter === 'all' 
     ? orders 
@@ -101,6 +125,7 @@ const Orders = () => {
   }
 
   return (
+    <>
     <div className="min-h-screen bg-light-theme dark:bg-dark-theme py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
@@ -174,7 +199,7 @@ const Orders = () => {
                         <div className="space-y-1">
                           {order.items.slice(0, 3).map((item, index) => (
                             <p key={index} className="text-sm text-gray-600 dark:text-gray-400">
-                              {item.quantity}x {item.name} - ${(Number(item.price) * item.quantity).toFixed(2)}
+                              {item.quantity}x {item.name} - ETB {(Number(item.price) * item.quantity).toFixed(2)}
                             </p>
                           ))}
                           {order.items.length > 3 && (
@@ -196,30 +221,39 @@ const Orders = () => {
                     </div>
                     
                     <div className="flex justify-between items-center border-t border-gray-200 dark:border-dark-700 pt-4">
-                      <div>
+                      <div className="flex items-center gap-3">
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                           {order.items.length} item(s)
                         </p>
+                        {canCancel(order.status) && (
+                          <button
+                            onClick={() => handleCancelClick(order)}
+                            className="flex items-center gap-1 text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 border border-red-300 dark:border-red-700 px-3 py-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                          >
+                            <XCircle size={14} />
+                            Cancel Order
+                          </button>
+                        )}
                       </div>
                       <div className="text-right">
                         <div className="space-y-1">
                           <div className="flex justify-between text-sm">
                             <span className="text-gray-600 dark:text-gray-400">Subtotal:</span>
-                            <span className="text-gray-900 dark:text-gray-100">${order.subtotal.toFixed(2)}</span>
+                            <span className="text-gray-900 dark:text-gray-100">ETB {order.subtotal.toFixed(2)}</span>
                           </div>
                           <div className="flex justify-between text-sm">
                             <span className="text-gray-600 dark:text-gray-400">Tax:</span>
-                            <span className="text-gray-900 dark:text-gray-100">${order.tax.toFixed(2)}</span>
+                            <span className="text-gray-900 dark:text-gray-100">ETB {order.tax.toFixed(2)}</span>
                           </div>
                           <div className="flex justify-between text-sm">
                             <span className="text-gray-600 dark:text-gray-400">Delivery:</span>
                             <span className="text-gray-900 dark:text-gray-100">
-                              {order.deliveryFee === 0 ? 'FREE' : `$${order.deliveryFee.toFixed(2)}`}
+                              {order.deliveryFee === 0 ? 'FREE' : `ETB ${order.deliveryFee.toFixed(2)}`}
                             </span>
                           </div>
                           <div className="flex justify-between font-bold">
                             <span className="text-gray-900 dark:text-gray-100">Total:</span>
-                            <span className="text-gray-900 dark:text-gray-100">${order.total.toFixed(2)}</span>
+                            <span className="text-gray-900 dark:text-gray-100">ETB {order.total.toFixed(2)}</span>
                           </div>
                         </div>
                       </div>
@@ -250,6 +284,45 @@ const Orders = () => {
         )}
       </div>
     </div>
+
+    {/* Cancel Confirmation Modal */}
+    <Modal
+      isOpen={showCancelModal}
+      onClose={() => setShowCancelModal(false)}
+      title="Cancel Order"
+    >
+      <div className="flex items-start space-x-3 mb-4">
+        <AlertTriangle className="text-red-500 flex-shrink-0 mt-0.5" size={20} />
+        <div>
+          <p className="text-gray-900 dark:text-gray-100 font-medium mb-1">
+            Are you sure you want to cancel this order?
+          </p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            Order <span className="font-mono font-medium">{orderToCancel?.orderId}</span> will be cancelled.
+            This action cannot be undone.
+          </p>
+          <p className="text-sm text-orange-600 dark:text-orange-400 mt-2">
+            Note: Orders can only be cancelled while in <strong>Pending</strong> or <strong>Confirmed</strong> status.
+            Once preparation starts, cancellation is not possible.
+          </p>
+        </div>
+      </div>
+      <div className="flex justify-end space-x-3 pt-2">
+        <button
+          onClick={() => setShowCancelModal(false)}
+          className="px-4 py-2 border border-gray-300 dark:border-dark-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-700 transition-colors"
+        >
+          Keep Order
+        </button>
+        <button
+          onClick={confirmCancel}
+          className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+        >
+          Yes, Cancel Order
+        </button>
+      </div>
+    </Modal>
+    </>
   );
 };
 

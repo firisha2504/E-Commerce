@@ -75,34 +75,6 @@ const Cart = () => {
             <ShoppingCart className="w-24 h-24 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Your cart is empty</h2>
             <p className="text-gray-600 dark:text-gray-400 mb-6">Add some delicious items to get started!</p>
-            
-            {/* Debug info */}
-            <div className="bg-yellow-100 dark:bg-yellow-900/20 border border-yellow-400 rounded-lg p-4 mb-6 text-left max-w-md mx-auto">
-              <h3 className="font-bold text-yellow-800 dark:text-yellow-400 mb-2">🐛 Debug Info:</h3>
-              <p className="text-sm text-yellow-700 dark:text-yellow-300">
-                Cart Items: {cartItems.length}<br/>
-                Item Count: {itemCount}<br/>
-                Total: ${total?.toFixed(2) || '0.00'}
-              </p>
-            </div>
-            
-            {/* Always visible checkout button for testing */}
-            <div className="mb-6">
-              <Link
-                to="/checkout"
-                className="inline-flex items-center px-8 py-4 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-colors text-lg shadow-lg mr-4"
-              >
-                🚀 Test Checkout Button (Always Visible)
-              </Link>
-              
-              <button
-                onClick={() => window.location.href = '/checkout'}
-                className="inline-flex items-center px-8 py-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors text-lg shadow-lg"
-              >
-                🔵 Alternative Checkout
-              </button>
-            </div>
-            
             <Link
               to="/products"
               className="inline-flex items-center px-6 py-3 bg-primary-600 dark:bg-accent-500 text-white font-medium rounded-lg hover:bg-primary-700 dark:hover:bg-accent-600 transition-colors"
@@ -133,7 +105,7 @@ const Cart = () => {
                         <div className="w-20 h-20 bg-gray-200 dark:bg-dark-700 rounded-lg"></div>
                         <div>
                           <h3 className="font-medium text-gray-900 dark:text-gray-100">{item.name}</h3>
-                          <p className="text-gray-600 dark:text-gray-400 text-sm">${Number(item.price).toFixed(2)} each</p>
+                          <p className="text-gray-600 dark:text-gray-400 text-sm">ETB {Number(item.price).toFixed(2)} each</p>
                         </div>
                       </div>
                       
@@ -154,7 +126,7 @@ const Cart = () => {
                           </button>
                         </div>
                         <div className="text-right">
-                          <p className="font-semibold text-gray-900 dark:text-gray-100">${(Number(item.price) * item.quantity).toFixed(2)}</p>
+                          <p className="font-semibold text-gray-900 dark:text-gray-100">ETB {(Number(item.price) * item.quantity).toFixed(2)}</p>
                           <button 
                             onClick={() => handleRemoveItem(item.id)}
                             className="text-red-500 hover:text-red-700 text-sm flex items-center"
@@ -192,15 +164,15 @@ const Cart = () => {
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between">
                   <span className="text-gray-600 dark:text-gray-400">Subtotal</span>
-                  <span className="font-medium text-gray-900 dark:text-gray-100">${calculateSubtotal().toFixed(2)}</span>
+                  <span className="font-medium text-gray-900 dark:text-gray-100">ETB {calculateSubtotal().toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600 dark:text-gray-400">Tax</span>
-                  <span className="text-gray-900 dark:text-gray-100">${calculateTax().toFixed(2)}</span>
+                  <span className="text-gray-900 dark:text-gray-100">ETB {calculateTax().toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-lg font-bold border-t border-gray-200 dark:border-dark-700 pt-4 mt-4">
                   <span className="text-gray-900 dark:text-gray-100">Total</span>
-                  <span className="text-gray-900 dark:text-gray-100">${calculateTotal().toFixed(2)}</span>
+                  <span className="text-gray-900 dark:text-gray-100">ETB {calculateTotal().toFixed(2)}</span>
                 </div>
               </div>
 
@@ -209,7 +181,7 @@ const Cart = () => {
                 className="w-full bg-primary-600 dark:bg-accent-500 text-white py-4 px-6 rounded-lg font-semibold hover:bg-primary-700 dark:hover:bg-accent-600 transition-colors flex items-center justify-center space-x-2 text-lg shadow-lg"
               >
                 <span>
-                  {detectedPromo ? `Checkout with ${detectedPromo} • $${calculateTotal().toFixed(2)}` : `Proceed to Checkout • $${calculateTotal().toFixed(2)}`}
+                  {detectedPromo ? `Checkout with ${detectedPromo} • ETB ${calculateTotal().toFixed(2)}` : `Proceed to Checkout • ETB ${calculateTotal().toFixed(2)}`}
                 </span>
                 <ArrowRight size={24} />
               </Link>
@@ -227,9 +199,9 @@ const Cart = () => {
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 Have questions about your order? Contact our support team.
               </p>
-              <button className="text-primary-600 dark:text-accent-400 hover:text-primary-700 dark:hover:text-accent-300 font-medium">
+              <Link to="/contact" className="text-primary-600 dark:text-accent-400 hover:text-primary-700 dark:hover:text-accent-300 font-medium">
                 Contact Support
-              </button>
+              </Link>
             </div>
           </div>
         </div>

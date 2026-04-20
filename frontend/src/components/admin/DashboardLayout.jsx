@@ -108,7 +108,7 @@ const DashboardLayout = ({ children, title, actions }) => {
                         onClick={() => setShowNotifications(false)}
                         className="p-1 hover:bg-gray-100 dark:hover:bg-dark-700 rounded"
                       >
-                        <X size={16} className="text-gray-500" />
+                        <X size={16} className="text-gray-500 dark:text-gray-400" />
                       </button>
                     </div>
                     

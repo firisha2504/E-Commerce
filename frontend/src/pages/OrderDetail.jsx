@@ -165,7 +165,7 @@ const OrderDetail = () => {
                       </div>
                     </div>
                     <p className="font-semibold text-gray-900 dark:text-gray-100">
-                      ${((item.price || 0) * (item.quantity || 1)).toFixed(2)}
+                      ETB {((item.price || 0) * (item.quantity || 1)).toFixed(2)}
                     </p>
                   </div>
                 ))}
@@ -181,20 +181,20 @@ const OrderDetail = () => {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-gray-600 dark:text-gray-400">Subtotal</span>
-                  <span className="text-gray-900 dark:text-gray-100">${(order.subtotal || 0).toFixed(2)}</span>
+                  <span className="text-gray-900 dark:text-gray-100">ETB {(order.subtotal || 0).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600 dark:text-gray-400">Delivery Fee</span>
-                  <span className="text-gray-900 dark:text-gray-100">${(order.deliveryFee || 0).toFixed(2)}</span>
+                  <span className="text-gray-900 dark:text-gray-100">ETB {(order.deliveryFee || 0).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600 dark:text-gray-400">Tax</span>
-                  <span className="text-gray-900 dark:text-gray-100">${(order.tax || 0).toFixed(2)}</span>
+                  <span className="text-gray-900 dark:text-gray-100">ETB {(order.tax || 0).toFixed(2)}</span>
                 </div>
                 <div className="border-t border-gray-200 dark:border-dark-700 pt-3 flex justify-between">
                   <span className="font-semibold text-gray-900 dark:text-gray-100">Total</span>
                   <span className="font-bold text-xl text-gray-900 dark:text-gray-100">
-                    ${(order.totalAmount || 0).toFixed(2)}
+                    ETB {(order.totalAmount || 0).toFixed(2)}
                   </span>
                 </div>
               </div>

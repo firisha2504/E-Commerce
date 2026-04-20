@@ -61,17 +61,18 @@ const Register = () => {
         <div>
           <div className="flex justify-center">
             <div className="w-12 h-12 rounded-full overflow-hidden shadow-lg">
-              <img 
-                src={logoUrl} 
-                alt="FA Restaurant Logo" 
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  // Fallback to text logo if image fails to load
-                  e.target.style.display = 'none';
-                  e.target.nextElementSibling.style.display = 'flex';
-                }}
-              />
-              <div className="w-full h-full bg-primary-600 dark:bg-accent-500 rounded-full hidden items-center justify-center">
+              {logoUrl ? (
+                <img 
+                  src={logoUrl} 
+                  alt="FA Restaurant Logo" 
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextElementSibling.style.display = 'flex';
+                  }}
+                />
+              ) : null}
+              <div className={`w-full h-full bg-primary-600 dark:bg-accent-500 rounded-full ${logoUrl ? 'hidden' : 'flex'} items-center justify-center`}>
                 <span className="text-white font-bold text-lg">FA</span>
               </div>
             </div>

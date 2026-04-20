@@ -60,10 +60,10 @@ const ProductDetail = () => {
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-dark-theme py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Product Not Found</h1>
-          <p className="text-gray-600">The product you're looking for doesn't exist.</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">Product Not Found</h1>
+          <p className="text-gray-600 dark:text-gray-400">The product you're looking for doesn't exist.</p>
         </div>
       </div>
     );
@@ -161,7 +161,7 @@ const ProductDetail = () => {
                 </div>
                 <span className="text-gray-600 dark:text-gray-400">(24 reviews)</span>
               </div>
-              <p className="text-3xl font-bold text-primary-600 dark:text-accent-400 mb-6">${product.price}</p>
+              <p className="text-3xl font-bold text-primary-600 dark:text-accent-400 mb-6">ETB {product.price}</p>
             </div>
 
             <div className="mb-8">
@@ -265,7 +265,7 @@ const ProductDetail = () => {
                     
                     {/* Price Badge */}
                     <div className="absolute top-4 right-4 bg-primary-600 dark:bg-accent-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg transform translate-x-12 group-hover:translate-x-0 transition-transform duration-500">
-                      ${relatedProduct.price}
+                      ETB {relatedProduct.price}
                     </div>
                     
                     {/* Quick Add Button */}

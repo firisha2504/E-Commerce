@@ -52,7 +52,7 @@ const Home = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section with Background Image */}
-      <section className="relative bg-gray-900 text-white py-32 overflow-hidden">
+      <section className="relative bg-gray-900 text-white py-20 overflow-hidden">
         {/* Background Image with Overlay */}
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -66,16 +66,16 @@ const Home = () => {
         {/* Content */}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 text-white leading-tight">
+            <h1 className="text-3xl md:text-4xl font-bold mb-4 text-white leading-tight">
               Delicious Meals<br />
               Delivered To Your Door
             </h1>
-            <p className="text-xl md:text-2xl mb-8 text-gray-200">
+            <p className="text-base md:text-lg mb-6 text-gray-200">
               Order your favorite Ethiopian dishes and get them delivered fresh and hot to your doorstep.
             </p>
             <Link
               to="/products"
-              className="inline-block bg-primary-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-primary-700 transition-colors shadow-lg text-lg"
+              className="inline-block bg-primary-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-700 transition-colors shadow-lg text-sm"
             >
               Explore Menu
             </Link>
@@ -145,7 +145,7 @@ const Home = () => {
                     }`}
                   >
                     <div className={`relative overflow-hidden ${
-                      viewMode === 'list' ? 'w-64 h-64' : 'w-full h-64'
+                      viewMode === 'list' ? 'w-48 h-48' : 'w-full h-48'
                     }`}>
                       <ProductImage
                         src={product.imageUrl}
@@ -158,7 +158,7 @@ const Home = () => {
                       
                       {/* Price Badge */}
                       <div className="absolute top-4 right-4 bg-primary-600 dark:bg-accent-500 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg transform translate-x-12 group-hover:translate-x-0 transition-transform duration-500">
-                        ${product.price}
+                        ETB {product.price}
                       </div>
                       
                       {/* Quick Add Button */}

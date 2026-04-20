@@ -12,7 +12,8 @@ import {
   ChevronRight,
   Home,
   UserCog,
-  Tag
+  Tag,
+  HeadphonesIcon
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import ThemeToggle from '../common/ThemeToggle';
@@ -28,6 +29,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
     { icon: ShoppingBag, label: 'Orders', path: '/admin/orders' },
     { icon: Users, label: 'Customers', path: '/admin/customers' },
     { icon: BarChart3, label: 'Analytics', path: '/admin/analytics' },
+    { icon: HeadphonesIcon, label: 'Support', path: '/admin/support' },
     { icon: Settings, label: 'Settings', path: '/admin/settings' },
     { icon: UserCog, label: 'My Profile', path: '/admin/profile' },
   ];
@@ -41,7 +43,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
   };
 
   return (
-    <div className={`${isCollapsed ? 'w-16' : 'w-64'} bg-white dark:bg-dark-800 border-r border-gray-200 dark:border-dark-700 transition-all duration-300 flex flex-col h-screen sticky top-0`}>
+    <div className={`${isCollapsed ? 'w-14' : 'w-56'} bg-white dark:bg-dark-800 border-r border-gray-200 dark:border-dark-700 transition-all duration-300 flex flex-col h-screen sticky top-0`}>
       {/* Header */}
       <div className="p-4 border-b border-gray-200 dark:border-dark-700">
         <div className="flex items-center justify-between">

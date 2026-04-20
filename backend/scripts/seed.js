@@ -33,7 +33,7 @@ async function seedDatabase() {
         description: 'Traditional Ethiopian chicken stew with hard-boiled eggs, served with injera bread. A spicy and flavorful dish that represents the heart of Ethiopian cuisine.',
         categoryId: foodCategoryId,
         price: 25.00,
-        imageUrl: 'https://images.unsplash.com/photo-1574484284002-952d92456975?w=400&h=300&fit=crop',
+        imageUrl: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=300&fit=crop',
         customizationOptions: JSON.stringify({
           spice: ['mild', 'medium', 'hot'],
           size: ['regular', 'large'],
@@ -70,7 +70,7 @@ async function seedDatabase() {
         description: 'Sautéed beef or lamb with onions, peppers, and Ethiopian spices. Served with injera or rice.',
         categoryId: foodCategoryId,
         price: 28.00,
-        imageUrl: 'https://images.unsplash.com/photo-1574484284002-952d92456975?w=400&h=300&fit=crop',
+        imageUrl: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=300&fit=crop',
         customizationOptions: JSON.stringify({
           meat: ['beef', 'lamb'],
           spice: ['mild', 'medium', 'hot'],
@@ -144,7 +144,7 @@ async function seedDatabase() {
         description: 'Freshly squeezed orange juice, rich in vitamin C and natural sweetness.',
         categoryId: beverageCategoryId,
         price: 5.50,
-        imageUrl: 'https://images.unsplash.com/photo-1546173159-315724a31696?w=400&h=300&fit=crop',
+        imageUrl: 'https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=400&h=300&fit=crop',
         customizationOptions: JSON.stringify({
           size: ['small', 'medium', 'large'],
           pulp: ['no_pulp', 'some_pulp', 'lots_of_pulp']

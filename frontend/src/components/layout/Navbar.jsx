@@ -41,21 +41,22 @@ const Navbar = () => {
   return (
     <nav className="navbar-glass sticky top-0 z-50 transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-14">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 group">
             <div className="w-10 h-10 rounded-xl shadow-lg group-hover:shadow-glow dark:group-hover:shadow-glow-cyan transition-all duration-300 overflow-hidden">
-              <img 
-                src={logoUrl} 
-                alt="FA Restaurant Logo" 
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  // Fallback to text logo if image fails to load
-                  e.target.style.display = 'none';
-                  e.target.nextElementSibling.style.display = 'flex';
-                }}
-              />
-              <div className="w-full h-full bg-primary-600 dark:bg-accent-500 rounded-xl hidden items-center justify-center">
+              {logoUrl ? (
+                <img 
+                  src={logoUrl} 
+                  alt="FA Restaurant Logo" 
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextElementSibling.style.display = 'flex';
+                  }}
+                />
+              ) : null}
+              <div className={`w-full h-full bg-primary-600 dark:bg-accent-500 rounded-xl ${logoUrl ? 'hidden' : 'flex'} items-center justify-center`}>
                 <span className="text-white font-bold text-lg">FA</span>
               </div>
             </div>

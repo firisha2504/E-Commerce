@@ -372,7 +372,7 @@ const AdminCustomers = () => {
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Real Revenue</p>
-                <p className="text-2xl font-semibold text-gray-900 dark:text-white">${stats.realRevenue.toLocaleString()}</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-white">ETB {stats.realRevenue.toLocaleString()}</p>
               </div>
             </div>
           </div>
@@ -607,7 +607,7 @@ const AdminCustomers = () => {
                   </div>
                   <div>
                     <p className="text-sm text-gray-600 dark:text-gray-400">Total Spent</p>
-                    <p className="text-lg font-semibold text-gray-900 dark:text-white">${selectedCustomer.totalSpent.toLocaleString()}</p>
+                    <p className="text-lg font-semibold text-gray-900 dark:text-white">ETB {selectedCustomer.totalSpent.toLocaleString()}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600 dark:text-gray-400">Loyalty Points</p>
@@ -628,7 +628,7 @@ const AdminCustomers = () => {
                     </div>
                     {selectedCustomer.suggestedCategory === 'real' && selectedCustomer.customerCategory === 'temporary' && (
                       <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
-                        💡 This customer has {selectedCustomer.totalOrders} orders and spent ${selectedCustomer.totalSpent} - consider promoting to Real Customer
+                        💡 This customer has {selectedCustomer.totalOrders} orders and spent ETB ${selectedCustomer.totalSpent} - consider promoting to Real Customer
                       </p>
                     )}
                   </div>
@@ -739,7 +739,7 @@ const AdminCustomers = () => {
               {selectedCustomer.suggestedCategory === 'real' && selectedCustomer.customerCategory === 'temporary' && (
                 <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded p-2 mt-2">
                   <p className="text-xs text-orange-800 dark:text-orange-200">
-                    💡 <strong>Suggestion:</strong> This customer has {selectedCustomer.totalOrders} orders and spent ${selectedCustomer.totalSpent}. 
+                    💡 <strong>Suggestion:</strong> This customer has {selectedCustomer.totalOrders} orders and spent ETB ${selectedCustomer.totalSpent}. 
                     Consider promoting to "Real Customer" status for better service and loyalty rewards.
                   </p>
                 </div>

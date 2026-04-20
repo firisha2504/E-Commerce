@@ -11,7 +11,8 @@ export const useLogo = () => {
 };
 
 export const LogoProvider = ({ children }) => {
-  const [logoUrl, setLogoUrl] = useState('/images/fa-restaurant-logo.png');
+  // Use empty string so the img onError fallback triggers immediately
+  const [logoUrl, setLogoUrl] = useState('');
 
   // Load logo from localStorage on mount
   useEffect(() => {
@@ -27,7 +28,7 @@ export const LogoProvider = ({ children }) => {
   };
 
   const resetLogo = () => {
-    setLogoUrl('/images/fa-restaurant-logo.png');
+    setLogoUrl('');
     localStorage.removeItem('restaurantLogo');
   };
 

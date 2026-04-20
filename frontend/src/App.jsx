@@ -35,6 +35,7 @@ import AdminCustomers from './pages/admin/Customers';
 import AdminAnalytics from './pages/admin/Analytics';
 import AdminSettings from './pages/admin/Settings';
 import AdminProfile from './pages/admin/AdminProfile';
+import AdminSupport from './pages/admin/Support';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -70,16 +71,16 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <LogoProvider>
-          <AuthProvider>
-          <CartProvider>
-            <Router
-              future={{
-                v7_startTransition: true,
-                v7_relativeSplatPath: true,
-              }}
-            >
-              <LayoutWrapper>
-                <Routes>
+          <Router
+            future={{
+              v7_startTransition: true,
+              v7_relativeSplatPath: true,
+            }}
+          >
+            <AuthProvider>
+              <CartProvider>
+                <LayoutWrapper>
+                  <Routes>
                   {/* Public routes */}
                   <Route path="/" element={<Home />} />
                   <Route path="/products" element={<Products />} />
@@ -159,6 +160,11 @@ function App() {
                       <AdminProfile />
                     </AdminRoute>
                   } />
+                  <Route path="/admin/support" element={
+                    <AdminRoute>
+                      <AdminSupport />
+                    </AdminRoute>
+                  } />
                 </Routes>
               </LayoutWrapper>
               <Toaster 
@@ -172,13 +178,13 @@ function App() {
                   },
                 }}
               />
-            </Router>
-          </CartProvider>
-        </AuthProvider>
-      </LogoProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
-);
+              </CartProvider>
+            </AuthProvider>
+          </Router>
+        </LogoProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
+  );
 }
 
 export default App;

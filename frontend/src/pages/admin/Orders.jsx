@@ -207,7 +207,7 @@ const AdminOrders = () => {
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Revenue</p>
                 <p className="text-2xl font-semibold text-gray-900 dark:text-white">
-                  ${getTotalRevenue().toFixed(2)}
+                  ETB {getTotalRevenue().toFixed(2)}
                 </p>
               </div>
             </div>
@@ -296,7 +296,7 @@ const AdminOrders = () => {
                       {order.items.length} items
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      ${order.total.toFixed(2)}
+                      ETB {order.total.toFixed(2)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center space-x-2">
@@ -406,9 +406,9 @@ const AdminOrders = () => {
                   <div key={index} className="flex justify-between items-center bg-gray-50 dark:bg-dark-700 rounded-lg p-3">
                     <div>
                       <p className="font-medium text-gray-900 dark:text-white">{item.name}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Quantity: {item.quantity} × ${Number(item.price).toFixed(2)}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Quantity: {item.quantity} × ETB {Number(item.price).toFixed(2)}</p>
                     </div>
-                    <p className="font-semibold text-gray-900 dark:text-white">${(Number(item.price) * item.quantity).toFixed(2)}</p>
+                    <p className="font-semibold text-gray-900 dark:text-white">ETB {(Number(item.price) * item.quantity).toFixed(2)}</p>
                   </div>
                 ))}
               </div>
@@ -427,11 +427,11 @@ const AdminOrders = () => {
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-gray-600 dark:text-gray-400">Subtotal:</span>
-                  <span className="text-gray-900 dark:text-white">${selectedOrder.subtotal.toFixed(2)}</span>
+                  <span className="text-gray-900 dark:text-white">ETB {selectedOrder.subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600 dark:text-gray-400">Tax:</span>
-                  <span className="text-gray-900 dark:text-white">${selectedOrder.tax.toFixed(2)}</span>
+                  <span className="text-gray-900 dark:text-white">ETB {selectedOrder.tax.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600 dark:text-gray-400">Delivery Fee:</span>
@@ -441,7 +441,7 @@ const AdminOrders = () => {
                 </div>
                 <div className="flex justify-between items-center border-t pt-2">
                   <span className="text-lg font-semibold text-gray-900 dark:text-white">Total Amount:</span>
-                  <span className="text-lg font-bold text-primary-600 dark:text-accent-400">${selectedOrder.total.toFixed(2)}</span>
+                  <span className="text-lg font-bold text-primary-600 dark:text-accent-400">ETB {selectedOrder.total.toFixed(2)}</span>
                 </div>
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
