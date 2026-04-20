@@ -121,42 +121,6 @@ const Navbar = () => {
 
           {/* Right side actions */}
           <div className="flex items-center space-x-4">
-            {/* Search */}
-            <div className="relative">
-              <button 
-                onClick={() => {
-                  const searchInput = document.getElementById('navbar-search');
-                  if (searchInput) {
-                    searchInput.classList.toggle('hidden');
-                    searchInput.focus();
-                  }
-                }}
-                className="p-2 text-gray-600 dark:text-gray-400 hover:text-primary-500 dark:hover:text-accent-400 transition-colors duration-200"
-              >
-                <Search size={20} />
-              </button>
-              
-              {/* Search Input */}
-              <div id="navbar-search" className="hidden absolute right-0 top-full mt-2 w-64 bg-white dark:bg-dark-800 rounded-lg shadow-lg border border-gray-200 dark:border-dark-700 p-2 z-50">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-                  <input
-                    type="text"
-                    placeholder="Search products..."
-                    className="w-full pl-10 pr-4 py-2 bg-transparent border-none focus:outline-none text-gray-900 dark:text-gray-100"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        const searchTerm = e.target.value;
-                        if (searchTerm.trim()) {
-                          window.location.href = `/products?search=${encodeURIComponent(searchTerm)}`;
-                        }
-                      }
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-
             {/* Theme Toggle */}
             <ThemeToggle />
 

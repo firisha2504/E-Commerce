@@ -80,29 +80,29 @@ const SpecialOffers = () => {
         </div>
 
         {/* Featured Offer Banner */}
-        <div className="mb-12 bg-gradient-to-r from-primary-600 to-orange-600 dark:from-accent-600 dark:to-accent-700 rounded-2xl shadow-xl overflow-hidden">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8 md:p-12">
+        <div className="mb-8 bg-gradient-to-r from-primary-600 to-orange-600 dark:from-accent-600 dark:to-accent-700 rounded-xl shadow-lg overflow-hidden">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-5 md:p-7">
             <div className="flex flex-col justify-center text-white">
-              <div className="inline-flex items-center space-x-2 mb-4">
-                <Gift size={24} />
-                <span className="text-sm font-semibold uppercase tracking-wide">Limited Time Offer</span>
+              <div className="inline-flex items-center space-x-2 mb-2">
+                <Gift size={16} />
+                <span className="text-xs font-semibold uppercase tracking-wide">Limited Time Offer</span>
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              <h2 className="text-xl md:text-2xl font-bold mb-2">
                 Grand Opening Special
               </h2>
-              <p className="text-lg mb-6 text-white/90">
+              <p className="text-sm mb-4 text-white/90">
                 Celebrate with us! Get 25% off on all orders this month. Use code: GRAND25
               </p>
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-wrap gap-3">
                 <Link
                   to="/products?promo=GRAND25"
-                  className="bg-white text-primary-600 dark:text-accent-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-flex items-center"
+                  className="bg-white text-primary-600 dark:text-accent-600 px-4 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-flex items-center text-sm"
                 >
                   Order Now
-                  <ShoppingCart className="ml-2" size={20} />
+                  <ShoppingCart className="ml-2" size={16} />
                 </Link>
-                <div className="flex items-center space-x-2 text-white/90">
-                  <Clock size={20} />
+                <div className="flex items-center space-x-2 text-white/90 text-sm">
+                  <Clock size={16} />
                   <span>Valid until end of month</span>
                 </div>
               </div>
@@ -110,11 +110,11 @@ const SpecialOffers = () => {
             <div className="hidden md:flex items-center justify-center">
               <div className="relative">
                 <div className="absolute inset-0 bg-white/20 rounded-full blur-3xl"></div>
-                <div className="relative bg-white/10 backdrop-blur-sm rounded-2xl p-8 border-2 border-white/30">
+                <div className="relative bg-white/10 backdrop-blur-sm rounded-xl p-5 border-2 border-white/30">
                   <div className="text-center">
-                    <Percent className="mx-auto mb-4" size={64} />
-                    <div className="text-6xl font-bold mb-2">25%</div>
-                    <div className="text-xl">OFF</div>
+                    <Percent className="mx-auto mb-2" size={36} />
+                    <div className="text-4xl font-bold mb-1">25%</div>
+                    <div className="text-base">OFF</div>
                   </div>
                 </div>
               </div>

@@ -7,6 +7,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
 import { LogoProvider } from './contexts/LogoContext';
+import { FavoritesProvider } from './contexts/FavoritesContext';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -36,6 +37,7 @@ import AdminAnalytics from './pages/admin/Analytics';
 import AdminSettings from './pages/admin/Settings';
 import AdminProfile from './pages/admin/AdminProfile';
 import AdminSupport from './pages/admin/Support';
+import Favorites from './pages/Favorites';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -79,6 +81,7 @@ function App() {
           >
             <AuthProvider>
               <CartProvider>
+                <FavoritesProvider>
                 <LayoutWrapper>
                   <Routes>
                   {/* Public routes */}
@@ -116,6 +119,11 @@ function App() {
                   <Route path="/profile" element={
                     <ProtectedRoute>
                       <Profile />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/favorites" element={
+                    <ProtectedRoute>
+                      <Favorites />
                     </ProtectedRoute>
                   } />
                   
@@ -178,6 +186,7 @@ function App() {
                   },
                 }}
               />
+              </FavoritesProvider>
               </CartProvider>
             </AuthProvider>
           </Router>

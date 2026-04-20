@@ -13,7 +13,19 @@ const Contact = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // In a real app, you would send this data to your backend
+    // Save message to localStorage so admin can see it
+    const messages = JSON.parse(localStorage.getItem('contact_messages') || '[]');
+    messages.unshift({
+      id: Date.now(),
+      name: formData.name,
+      email: formData.email,
+      subject: formData.subject,
+      message: formData.message,
+      createdAt: new Date().toISOString(),
+      status: 'unread',
+      reply: ''
+    });
+    localStorage.setItem('contact_messages', JSON.stringify(messages));
     setShowSuccessModal(true);
     setFormData({ name: '', email: '', subject: '', message: '' });
   };

@@ -788,6 +788,57 @@ const AdminSpecialOffers = () => {
             />
           </div>
           
+
+          {/* Apply To */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Apply To</label>
+            <div className="flex gap-3">
+              <label className={`flex-1 flex items-center gap-2 p-3 border-2 rounded-lg cursor-pointer transition-colors ${newOffer.applicationType === 'order' ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20' : 'border-gray-300 dark:border-dark-600'}`}>
+                <input type="radio" name="addApplyTo" value="order"
+                  checked={newOffer.applicationType === 'order'}
+                  onChange={() => handleInputChange('applicationType', 'order')} />
+                <div>
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">All Orders</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Discount on entire order</p>
+                </div>
+              </label>
+              <label className={`flex-1 flex items-center gap-2 p-3 border-2 rounded-lg cursor-pointer transition-colors ${newOffer.applicationType === 'product' ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20' : 'border-gray-300 dark:border-dark-600'}`}>
+                <input type="radio" name="addApplyTo" value="product"
+                  checked={newOffer.applicationType === 'product'}
+                  onChange={() => handleInputChange('applicationType', 'product')} />
+                <div>
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Specific Products</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Discount on selected products only</p>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          {newOffer.applicationType === 'product' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Select Products * <span className="text-xs text-gray-500">({newOffer.targetProducts.length} selected)</span>
+              </label>
+              <div className="border border-gray-300 dark:border-dark-600 rounded-lg max-h-44 overflow-y-auto p-2 bg-white dark:bg-dark-700">
+                {availableProducts.map(product => (
+                  <label key={product.id} className="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-dark-600 rounded cursor-pointer">
+                    <input type="checkbox"
+                      checked={newOffer.targetProducts.includes(product.id)}
+                      onChange={(e) => {
+                        const updated = e.target.checked
+                          ? [...newOffer.targetProducts, product.id]
+                          : newOffer.targetProducts.filter(id => id !== product.id);
+                        handleInputChange('targetProducts', updated);
+                      }} />
+                    <span className="text-sm text-gray-900 dark:text-gray-100 flex-1">{product.name}</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">{product.category}</span>
+                    <span className="text-xs font-medium text-primary-600 dark:text-accent-400">ETB {product.price}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Upload Image from Computer (Alternative to URL above)

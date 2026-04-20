@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Search, Filter, CheckCircle, Tag, Gift } from 'lucide-react';
+import { Search, Filter, CheckCircle, Tag, Gift, Heart } from 'lucide-react';
 import { productsAPI } from '../services/api';
 import ProductImage from '../components/common/ProductImage';
 import Modal from '../components/common/Modal';
 import { useCart } from '../contexts/CartContext';
+import { useFavorites } from '../contexts/FavoritesContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const Products = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -15,6 +17,8 @@ const Products = () => {
   const [searchParams] = useSearchParams();
   const [detectedOffer, setDetectedOffer] = useState(null);
   const { addToCart } = useCart();
+  const { toggleFavorite, isFavorite } = useFavorites();
+  const { isAuthenticated } = useAuth();
 
   // Detect promo code from URL
   useEffect(() => {
@@ -177,10 +181,17 @@ const Products = () => {
                 </div>
                 
                 {/* Favorite Button */}
-                <button className="absolute top-4 left-4 bg-white/90 dark:bg-dark-800/90 text-gray-600 dark:text-gray-400 p-2 rounded-full shadow-lg transform -translate-x-12 group-hover:translate-x-0 transition-all duration-500 hover:text-red-500">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
-                  </svg>
+                <button
+                  onClick={() => {
+                    if (!isAuthenticated) { toast.error('Please login to save favorites'); return; }
+                    const added = toggleFavorite(product);
+                    toast.success(added ? `${product.name} added to favorites!` : `${product.name} removed from favorites`);
+                  }}
+                  className="absolute top-4 left-4 bg-white/90 dark:bg-dark-800/90 p-2 rounded-full shadow-lg transform -translate-x-12 group-hover:translate-x-0 transition-all duration-500 hover:scale-110"
+                >
+                  <Heart
+                    className={`w-5 h-5 transition-colors ${isFavorite(product.id) ? 'text-red-500 fill-red-500' : 'text-gray-400 hover:text-red-400'}`}
+                  />
                 </button>
                 
                 {/* Quick Actions */}
